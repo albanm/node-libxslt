@@ -11,7 +11,10 @@ Stylesheet::Stylesheet(xsltStylesheetPtr stylesheetPtr) : stylesheet_obj(stylesh
 
 Stylesheet::~Stylesheet()
 {
-    xsltFreeStylesheet(stylesheet_obj);
+    // TODO, potential memory leak here ?
+    // We can't free the stylesheet as the xml doc inside was probably
+    // already deleted by garbage collector and this results in segfaults
+    //xsltFreeStylesheet(stylesheet_obj);
 }
 
 void Stylesheet::Init(Handle<Object> exports) {

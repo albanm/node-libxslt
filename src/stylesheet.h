@@ -1,4 +1,4 @@
-// Very simple v8 wrapper for xml document, see "Wrapping C++ objects" section here http://nodejs.org/api/addons.html
+// Very simple v8 wrapper for xslt stylesheet, see "Wrapping C++ objects" section here http://nodejs.org/api/addons.html
 
 #ifndef SRC_STYLESHEET_H_
 #define SRC_STYLESHEET_H_
