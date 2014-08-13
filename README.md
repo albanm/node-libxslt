@@ -22,7 +22,7 @@ var params = {
 
 // 'params' parameter is optional
 stylesheet.apply(documentString, params, function(err, result){
-	// err contains any error from parsing the document or applying the the stylesheet
+	// err contains any error from parsing the document or applying the stylesheet
 	// result is a string containing the result of the transformation
 });
 
@@ -99,6 +99,7 @@ Conclusion:
 OS compatibility
 ----------------
 
-Right now only 64bits linux is supported. The support of other environments is a work in progress.
+Right now only 64bits linux is confirmed.
+The support of other environments is a work in progress, please report an issue if you encounter some difficulties.
 
 For windows user: node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will have to go through its installation.
