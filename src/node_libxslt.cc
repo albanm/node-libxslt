@@ -50,7 +50,7 @@ char** PrepareParams(Handle<Array> array) {
     for (int i = 0; i < array->Length(); i++) {
         Local<String> param = array->Get(NanNew<Integer>(i))->ToString();
         params[i] = (char *)malloc(sizeof(char) * (param->Length() + 1));
-        param->WriteAscii(params[i]);
+        param->WriteUtf8(params[i]);
     }
     return params;
 }
