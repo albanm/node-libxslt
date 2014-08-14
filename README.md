@@ -1,6 +1,10 @@
 node-libxslt
 ============
 
+[![Build status](https://travis-ci.org/albanm/node-libxslt.svg)](https://travis-ci.org/albanm/node-libxslt)
+[![Code Climate](https://codeclimate.com/github/albanm/node-libxslt/badges/gpa.svg)](https://codeclimate.com/github/albanm/node-libxslt)
+[![NPM version](https://badge.fury.io/js/node-libxslt.svg)](http://badge.fury.io/js/node-libxslt)
+
 Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs](https://github.com/polotek/libxmljs/issues/226).
 
 Installation
@@ -96,10 +100,10 @@ Conclusion:
   - use synchronous only if you really want the highest performance and expect low concurrency.
   - of course you can also use synchronous simply to reduce code depth. If you don't expect a huge load it will be ok.
 
-OS compatibility
-----------------
+Environment compatibility
+-------------------------
 
 Right now only 64bits linux is confirmed.
 The support of other environments is a work in progress, please report an issue if you encounter some difficulties.
 
-For windows user: node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will have to go through its installation.
+Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will have to go through its installation. This can be a bit painful mostly for windows users. There is no system dependancy otherwise, libxslt is bundled in the project.
