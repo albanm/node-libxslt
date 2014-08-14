@@ -19,8 +19,8 @@ Stylesheet::~Stylesheet()
 
 void Stylesheet::Init(Handle<Object> exports) {
 	 // Prepare constructor template
-  	Local<FunctionTemplate> tpl = FunctionTemplate::New();
-  	tpl->SetClassName(String::NewSymbol("Stylesheet"));
+    Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>();
+    tpl->SetClassName(NanNew<String>("Stylesheet"));
   	tpl->InstanceTemplate()->SetInternalFieldCount(1);
   	
   	constructor = Persistent<Function>::New(tpl->GetFunction());
