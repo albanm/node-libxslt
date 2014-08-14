@@ -4,7 +4,7 @@
   "description": "Node.js bindings for libxslt",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha -R spec"
   },
   "keywords": [
     "xsl",
@@ -13,6 +13,14 @@
     "bindings"
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
+  "homepage": "https://github.com/albanm/node-libxslt",
+  "bugs": {
+    "url": "https://github.com/albanm/node-libxslt/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/albanm/node-libxslt.git"
+  },
   "license": "MIT",
   "dependencies": {
     "nan": "~1.2.0",
