@@ -23,7 +23,7 @@ void Stylesheet::Init(Handle<Object> exports) {
     tpl->SetClassName(NanNew<String>("Stylesheet"));
   	tpl->InstanceTemplate()->SetInternalFieldCount(1);
   	
-  	constructor = Persistent<Function>::New(tpl->GetFunction());
+    NanAssignPersistent(constructor, tpl->GetFunction());
 }
 
 // not called from node, private api
