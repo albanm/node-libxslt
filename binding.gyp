@@ -7,8 +7,7 @@
       'dependencies': [
       	'./deps/libxslt/libxslt.gyp:libxslt',
       	'./deps/libxslt/libxslt.gyp:libexslt'
-      ],
-      'cflags': ['-g'],
+      ]
     }
   ]
 }
