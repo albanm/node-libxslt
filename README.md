@@ -18,7 +18,7 @@ Basic usage
 ```js
 var lixslt = require('libxslt');
 
-var stylesheet = libxslt.stylesheet(stylesheetString);
+var stylesheet = libxslt.parse(stylesheetString);
 
 var params = {
 	MyParam: 'my value'
@@ -47,7 +47,7 @@ var lixslt = require('libxslt');
 var libxmljs = require('libxmljs');
 
 var stylesheetObj = libxmljs.parseXml(stylesheetString);
-var stylesheet = libxslt.stylesheet(stylesheetObj);
+var stylesheet = libxslt.parse(stylesheetObj);
 
 var document = libxmljs.parseXml(documentString);
 stylesheet.apply(document, function(err, result){
@@ -69,7 +69,7 @@ In this case if a parsing error occurs it will be thrown.
 ```js
 var lixslt = require('libxslt');
 
-var stylesheet = libxslt.stylesheet(stylesheetString);
+var stylesheet = libxslt.parse(stylesheetString);
 
 var result = stylesheet.apply(documentString);
 

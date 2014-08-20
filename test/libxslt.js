@@ -25,16 +25,16 @@ describe('node-libxslt bindings', function() {
 	describe('stylesheet function', function() {
 		it('should parse a stylesheet from a libxmljs xml document', function() {
 			var stylesheetDoc = libxmljs.parseXml(stylesheetSource);
-			stylesheet = libxslt.stylesheet(stylesheetDoc);
+			stylesheet = libxslt.parse(stylesheetDoc);
 			stylesheet.should.be.type('object');
 		});
 		it('should parse a stylesheet from a xml string', function() {
-			stylesheet = libxslt.stylesheet(stylesheetSource);
+			stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.should.be.type('object');
 		});
 		it('should throw an error when parsing invalid stylesheet', function() {
 			(function() {
-				libxslt.stylesheet('this is not a stylesheet!');
+				libxslt.parse('this is not a stylesheet!');
 			}).should.throw();
 		});
 	});

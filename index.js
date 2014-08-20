@@ -55,7 +55,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 	}
 };
 
-exports.stylesheet = function(source, callback) {
+exports.parse = function(source, callback) {
 	// stylesheet can be given as a string or a pre-parsed xml document
 	if (typeof source === 'string') source = libxmljs.parseXml(source);
 	
@@ -65,55 +65,3 @@ exports.stylesheet = function(source, callback) {
 		return new Stylesheet(source, binding.stylesheetSync(source));
 	}
 };
-
-/*
-var apply = function(stylesheet, source, params, callback) {
-	// xml can be given as a string or a pre-parsed xml document
-	var outputString = false;
-	if (typeof source === 'string') {
-		source = libxmljs.parseXml(source);
-		outputString = true;
-	}
-	// params are optional
-	if (typeof params === 'function') {
-		callback = params;
-		params = {};
-	}
-	params = params || {};
-
-	// flatten the params object in an array
-	var paramsArray = [];
-	for(var key in params) {
-		paramsArray.push(key);
-		paramsArray.push(params[key]);
-	}
-
-	// for some obscure reason I didn't manage to create a new libxmljs document in applySync,
-	// but passing a document by reference and modifying its content works fine
-	var result = new libxmljs.Document();
-
-	if (callback) {
-		binding.applyAsync(stylesheet, source, paramsArray, result, function(err){
-			if (err) return callback(err);
-			callback(null, outputString ? result.toString() : result);
-		});
-	} else {
-		binding.applySync(stylesheet, source, paramsArray, result);	
-		return outputString ? result.toString() : result;
-	}
-};
-
-exports.stylesheet = function(stylesheetSource) {
-	// stylesheet can be given as a string or a pre-parsed xml document
-	if (typeof stylesheetSource === 'string') stylesheetSource = libxmljs.parseXml(stylesheetSource);
-	
-	var stylesheet = binding.stylesheetSync(stylesheetSource);
-
-	stylesheetSource.stylesheet = stylesheet;
-	stylesheetSource.apply = function(source, params, callback){
-		return apply(stylesheet, source, params, callback);
-	};
-	
-	return stylesheetSource;
-};
-*/

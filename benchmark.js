@@ -5,7 +5,7 @@ var libxslt = require('./index');
 
 var stylesheetStr = fs.readFileSync('./test/resources/cd.xsl', 'utf8');
 var stylesheetObj = libxmljs.parseXml(stylesheetStr);
-var stylesheet = libxslt.stylesheet(stylesheetObj);
+var stylesheet = libxslt.parse(stylesheetObj);
 var docStr = fs.readFileSync('./test/resources/cd.xml', 'utf8');
 var docObj = libxmljs.parseXml(docStr);
 
@@ -22,14 +22,14 @@ var bench = function(name, iterations, f) {
 
 var stylesheetParsingStr = function(iterations, callback) {
 	for (var i = 0; i < iterations; i++) {
-		libxslt.stylesheet(stylesheetStr);
+		libxslt.parse(stylesheetStr);
 	}
 	callback();
 };
 
 var stylesheetParsingObj = function(iterations, callback) {
 	for (var i = 0; i < iterations; i++) {
-		libxslt.stylesheet(stylesheetObj);
+		libxslt.parse(stylesheetObj);
 	}
 	callback();
 };
