@@ -25,6 +25,12 @@
       }
     },
     'defines': ['HAVE_CONFIG_H','LIBXSLT_STATIC'],
+	'include_dirs': [
+	  '.',
+      # platform and arch-specific headers
+      'config/<(OS)/<(target_arch)',
+      '<@(xmljs_include_dirs)'
+    ]
   },
   'targets': [
     {
@@ -53,11 +59,6 @@
         'libxslt/xsltlocale.c',
         'libxslt/xsltutils.c'
       ],
-      'include_dirs': [
-        # platform and arch-specific headers
-        'config/<(OS)/<(target_arch)',
-        '<@(xmljs_include_dirs)'
-      ],
       'link_settings': {
 	      'libraries': [
 	        '<@(xmljs_libraries)',
@@ -65,7 +66,7 @@
 	    },
       'direct_dependent_settings': {
         'defines': ['LIBXSLT_STATIC'],
-        'include_dirs': ['libxslt', '<@(xmljs_include_dirs)'],
+        'include_dirs': ['.', '<@(xmljs_include_dirs)', 'config/<(OS)/<(target_arch)'],
       }
     },
     {
@@ -83,12 +84,6 @@
         'libexslt/sets.c',
         'libexslt/strings.c'
       ],
-      'include_dirs': [
-        # platform and arch-specific headers
-        'config/<(OS)/<(target_arch)',
-        '<@(xmljs_include_dirs)',
-        '.'
-      ],
       'dependencies': [
         'libxslt'
       ],
@@ -96,10 +91,7 @@
 	      'libraries': [
 	        '<@(xmljs_libraries)'
 	      ]
-	    },
-      'direct_dependent_settings': {
-        'include_dirs': ['libexslt']
-      }
+	    }
     }
   ]
 }
