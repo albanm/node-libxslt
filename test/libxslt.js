@@ -7,17 +7,17 @@ var libxslt = require('../index');
 
 describe('node-libxslt bindings', function() {
 	var stylesheetSource;
-	before(function(){
+	before(function(callback){
 		fs.readFile('./test/resources/cd.xsl', 'utf8', function(err, data){
-			if(err) throw(err);
 			stylesheetSource = data;
+			callback(err);
 		});
 	});
 	var docSource;
-	before(function(){
+	before(function(callback){
 		fs.readFile('./test/resources/cd.xml', 'utf8', function(err, data){
-			if(err) throw(err);
 			docSource = data;
+			callback(err);
 		});
 	});
 
