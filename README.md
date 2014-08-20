@@ -10,13 +10,13 @@ Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [lib
 Installation
 ------------
 
-	npm install node-libxslt
+	npm install libxslt
 
 Basic usage
 -----------
 
 ```js
-var lixslt = require('node-libxslt');
+var lixslt = require('libxslt');
 
 var stylesheet = libxslt.stylesheet(stylesheetString);
 
@@ -43,7 +43,7 @@ Node-libxslt depends on [libxmljs](https://github.com/polotek/libxmljs/issues/22
 It is possible to work with libxmljs documents instead of strings:
 
 ```js
-var lixslt = require('node-libxslt');
+var lixslt = require('libxslt');
 var libxmljs = require('libxmljs');
 
 var stylesheetObj = libxmljs.parseXml(stylesheetString);
@@ -67,7 +67,7 @@ The same *apply()* function can be used in synchronous mode simply by removing t
 In this case if a parsing error occurs it will be thrown.
 
 ```js
-var lixslt = require('node-libxslt');
+var lixslt = require('libxslt');
 
 var stylesheet = libxslt.stylesheet(stylesheetString);
 
