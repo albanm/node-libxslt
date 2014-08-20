@@ -3,7 +3,7 @@ node-libxslt
 
 [![Build status](https://travis-ci.org/albanm/node-libxslt.svg)](https://travis-ci.org/albanm/node-libxslt)
 [![Code Climate](https://codeclimate.com/github/albanm/node-libxslt/badges/gpa.svg)](https://codeclimate.com/github/albanm/node-libxslt)
-[![NPM version](https://badge.fury.io/js/node-libxslt.svg)](http://badge.fury.io/js/node-libxslt)
+[![NPM version](https://badge.fury.io/js/libxslt.svg)](http://badge.fury.io/js/libxslt)
 
 Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [libxmljs](https://github.com/polotek/libxmljs/issues/226).
 
@@ -106,6 +106,6 @@ Conclusion:
 Environment compatibility
 -------------------------
 
-Right 64bits linux and 32bits windows are confirmed. Other environments are probably ok, but not checked. Please report an issue if you encounter some difficulties.
+For now 64bits linux and 32bits windows are confirmed. Other environments are probably ok, but not checked. Please report an issue if you encounter some difficulties.
 
 Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will have to go through its installation. This can be a bit painful mostly for windows users. There is no system dependancy otherwise, libxslt is bundled in the project.

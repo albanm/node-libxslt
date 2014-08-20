@@ -1,7 +1,7 @@
 {
   "name": "libxslt",
   "version": "0.1.0",
-  "description": "Node.js bindings for libxslt",
+  "description": "Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec"
