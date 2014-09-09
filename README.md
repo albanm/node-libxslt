@@ -35,9 +35,6 @@ stylesheet.apply(documentString, params, function(err, result){
 Libxmljs integration
 --------------------
 
-:warning: right now node-libxslt is only compatible with the temporary fork [albanm/libxmljs](https://github.com/albanm/libxmljs).
-This situation will end if the [related pull request](https://github.com/polotek/libxmljs/pull/247) is accepted.
-
 Node-libxslt depends on [libxmljs](https://github.com/polotek/libxmljs/issues/226) in the same way that [libxslt](http://xmlsoft.org/libxslt/) depends on [libxml](http://xmlsoft.org/). This dependancy makes possible to bundle and to load in memory libxml only once for users of both libraries.
 
 It is possible to work with libxmljs documents instead of strings:
@@ -108,4 +105,4 @@ Environment compatibility
 
 For now 64bits linux and 32bits windows are confirmed. Other environments are probably ok, but not checked. Please report an issue if you encounter some difficulties.
 
-Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will have to go through its installation. This can be a bit painful mostly for windows users. There is no system dependancy otherwise, libxslt is bundled in the project.
+Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you will need to meet its requirements. This can be a bit painful mostly for windows users. The node-gyp version bundled in your npm will have to be greater than 0.13.0, so you might have to follow [these instructions to upgrade](https://github.com/TooTallNate/node-gyp/wiki/Updating-npm's-bundled-node-gyp). There is no system dependancy otherwise, libxslt is bundled in the project.

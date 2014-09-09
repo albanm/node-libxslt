@@ -5,7 +5,7 @@
     'xmljs_libraries%': [],
   },
   'target_defaults': {
-    'default_configuration': 'Debug',
+    'default_configuration': 'Release',
     'configurations': {
       'Debug': {
         'defines': [ 'DEBUG', '_DEBUG' ],
@@ -25,8 +25,8 @@
       }
     },
     'defines': ['HAVE_CONFIG_H','LIBXSLT_STATIC'],
-	'include_dirs': [
-	  '.',
+    'include_dirs': [
+      '.',
       # platform and arch-specific headers
       'config/<(OS)/<(target_arch)',
       '<@(xmljs_include_dirs)'
@@ -60,10 +60,10 @@
         'libxslt/xsltutils.c'
       ],
       'link_settings': {
-	      'libraries': [
-	        '<@(xmljs_libraries)',
-	      ]
-	    },
+        'libraries': [
+          '<@(xmljs_libraries)',
+        ]
+      },
       'direct_dependent_settings': {
         'defines': ['LIBXSLT_STATIC'],
         'include_dirs': ['.', '<@(xmljs_include_dirs)', 'config/<(OS)/<(target_arch)'],
@@ -88,10 +88,10 @@
         'libxslt'
       ],
       'link_settings': {
-	      'libraries': [
-	        '<@(xmljs_libraries)'
-	      ]
-	    }
+        'libraries': [
+          '<@(xmljs_libraries)'
+        ]
+      }
     }
   ]
 }
