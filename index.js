@@ -28,7 +28,7 @@ var Stylesheet = function(stylesheetDoc, stylesheetObj){
  * If no callback is given the function will run synchronously and return the result or throw an error.
  *
  * @param {string|Document} source - The content of the stylesheet as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
- * @param {parseCallback} [callback] - The callback that handles the response.
+ * @param {parseCallback} [callback] - The callback that handles the response. Expects err and Stylesheet object.
  * @return {Stylesheet} Only if no callback is given.
  */
 exports.parse = function(source, callback) {
@@ -62,7 +62,7 @@ exports.parse = function(source, callback) {
  * Parse a XSL stylesheet
  *
  * @param {stringPath} sourcePath - The path of the file
- * @param {parseFileCallback} [callback] - The callback that handles the response.
+ * @param {parseFileCallback} [callback] - The callback that handles the response. Expects err and Stylesheet object.
  */
 exports.parseFile = function(sourcePath, callback) {
 	fs.readFile(sourcePath, 'utf8', function(err, data){
@@ -83,8 +83,8 @@ exports.parseFile = function(sourcePath, callback) {
  * If no callback is given the function will run synchronously and return the result or throw an error.
  *
  * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
- * @param {object} [params] - Parameters passed to the stylesheet ({@linkhttp://www.w3schools.com/xsl/el_with-param.asp})
- * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response.
+ * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
+ * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.
  * @return {string|Document} Only if no callback is given. Type is the same as the source param.
  */
 Stylesheet.prototype.apply = function(source, params, callback) {
@@ -144,8 +144,8 @@ Stylesheet.prototype.apply = function(source, params, callback) {
  * Apply a stylesheet to a XML file
  *
  * @param {string} sourcePath - The path of the file to read
- * @param {object} [params] - Parameters passed to the stylesheet ({@linkhttp://www.w3schools.com/xsl/el_with-param.asp})
- * @param {Stylesheet~applyToFileCallback} [callback] - The callback that handles the response.
+ * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
+ * @param {Stylesheet~applyToFileCallback} [callback] - The callback that handles the response. Expects err and result as string.
  */
 Stylesheet.prototype.applyToFile = function(sourcePath, params, callback) {
 	var that = this;

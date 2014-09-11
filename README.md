@@ -141,7 +141,7 @@ If no callback is given the function will run synchronously and return the resul
 **Params**
 
 - source `string` | `Document` - The content of the stylesheet as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
-- \[callback\] <code>[parseCallback](#parseCallback)</code> - The callback that handles the response.  
+- \[callback\] <code>[parseCallback](#parseCallback)</code> - The callback that handles the response. Expects err and Stylesheet object.  
 
 **Returns**: `Stylesheet` - Only if no callback is given.  
 <a name="module_libxslt.parseFile"></a>
@@ -151,7 +151,7 @@ Parse a XSL stylesheet
 **Params**
 
 - sourcePath `stringPath` - The path of the file  
-- \[callback\] <code>[parseFileCallback](#parseFileCallback)</code> - The callback that handles the response.  
+- \[callback\] <code>[parseFileCallback](#parseFileCallback)</code> - The callback that handles the response. Expects err and Stylesheet object.  
 
 <a name="module_libxslt..Stylesheet"></a>
 ##class: libxslt~Stylesheet
@@ -184,8 +184,8 @@ If no callback is given the function will run synchronously and return the resul
 **Params**
 
 - source `string` | `Document` - The XML content to apply the stylesheet to given as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
-- \[params\] `object` - Parameters passed to the stylesheet ({@linkhttp://www.w3schools.com/xsl/el_with-param.asp})  
-- \[callback\] <code>[applyCallback](#Stylesheet..applyCallback)</code> - The callback that handles the response.  
+- \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
+- \[callback\] <code>[applyCallback](#Stylesheet..applyCallback)</code> - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.  
 
 **Returns**: `string` | `Document` - Only if no callback is given. Type is the same as the source param.  
 <a name="module_libxslt..Stylesheet#applyToFile"></a>
@@ -195,7 +195,7 @@ Apply a stylesheet to a XML file
 **Params**
 
 - sourcePath `string` - The path of the file to read  
-- \[params\] `object` - Parameters passed to the stylesheet ({@linkhttp://www.w3schools.com/xsl/el_with-param.asp})  
-- \[callback\] <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response.  
+- \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
+- \[callback\] <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response. Expects err and result as string.  
 
 *documented by [jsdoc-to-markdown](https://github.com/75lb/jsdoc-to-markdown)*.
