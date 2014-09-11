@@ -62,7 +62,7 @@ exports.parse = function(source, callback) {
  * Parse a XSL stylesheet
  *
  * @param {stringPath} sourcePath - The path of the file
- * @param {parseFileCallback} [callback] - The callback that handles the response. Expects err and Stylesheet object.
+ * @param {parseFileCallback} callback - The callback that handles the response. Expects err and Stylesheet object.
  */
 exports.parseFile = function(sourcePath, callback) {
 	fs.readFile(sourcePath, 'utf8', function(err, data){
@@ -137,7 +137,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
  * Callback to the Stylesheet.apply function
  * @callback Stylesheet~applyCallback
  * @param {error} [err] - Error either from parsing the XML document if given as a string or from applying the styleshet
- * @param {string|Document} [result] - Result of the same type as the source param passed to apply
+ * @param {string|Document} [result] Result of the same type as the source param passed to apply
  */
 
 /**
@@ -145,7 +145,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
  *
  * @param {string} sourcePath - The path of the file to read
  * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
- * @param {Stylesheet~applyToFileCallback} [callback] - The callback that handles the response. Expects err and result as string.
+ * @param {Stylesheet~applyToFileCallback} callback The callback that handles the response. Expects err and result as string.
  */
 Stylesheet.prototype.applyToFile = function(sourcePath, params, callback) {
 	var that = this;

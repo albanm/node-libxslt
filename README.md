@@ -126,11 +126,11 @@ Node.js bindings for libxslt compatible with libxmljs
 
 * [libxslt](#module_libxslt)
   * [libxslt.parse(source, [callback])](#module_libxslt.parse)
-  * [libxslt.parseFile(sourcePath, [callback])](#module_libxslt.parseFile)
+  * [libxslt.parseFile(sourcePath, callback)](#module_libxslt.parseFile)
   * [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
     * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
     * [stylesheet.apply(source, [params], [callback])](#module_libxslt..Stylesheet#apply)
-    * [stylesheet.applyToFile(sourcePath, [params], [callback])](#module_libxslt..Stylesheet#applyToFile)
+    * [stylesheet.applyToFile(sourcePath, [params], callback)](#module_libxslt..Stylesheet#applyToFile)
 
 <a name="module_libxslt.parse"></a>
 ##libxslt.parse(source, [callback])
@@ -145,13 +145,13 @@ If no callback is given the function will run synchronously and return the resul
 
 **Returns**: `Stylesheet` - Only if no callback is given.  
 <a name="module_libxslt.parseFile"></a>
-##libxslt.parseFile(sourcePath, [callback])
+##libxslt.parseFile(sourcePath, callback)
 Parse a XSL stylesheet
 
 **Params**
 
 - sourcePath `stringPath` - The path of the file  
-- \[callback\] <code>[parseFileCallback](#parseFileCallback)</code> - The callback that handles the response. Expects err and Stylesheet object.  
+- callback <code>[parseFileCallback](#parseFileCallback)</code> - The callback that handles the response. Expects err and Stylesheet object.  
 
 <a name="module_libxslt..Stylesheet"></a>
 ##class: libxslt~Stylesheet
@@ -160,7 +160,7 @@ Parse a XSL stylesheet
 * [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
   * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
   * [stylesheet.apply(source, [params], [callback])](#module_libxslt..Stylesheet#apply)
-  * [stylesheet.applyToFile(sourcePath, [params], [callback])](#module_libxslt..Stylesheet#applyToFile)
+  * [stylesheet.applyToFile(sourcePath, [params], callback)](#module_libxslt..Stylesheet#applyToFile)
 
 <a name="new_module_libxslt..Stylesheet"></a>
 ###new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)
@@ -189,13 +189,13 @@ If no callback is given the function will run synchronously and return the resul
 
 **Returns**: `string` | `Document` - Only if no callback is given. Type is the same as the source param.  
 <a name="module_libxslt..Stylesheet#applyToFile"></a>
-###stylesheet.applyToFile(sourcePath, [params], [callback])
+###stylesheet.applyToFile(sourcePath, [params], callback)
 Apply a stylesheet to a XML file
 
 **Params**
 
 - sourcePath `string` - The path of the file to read  
 - \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
-- \[callback\] <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response. Expects err and result as string.  
+- callback <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response. Expects err and result as string.  
 
 *documented by [jsdoc-to-markdown](https://github.com/75lb/jsdoc-to-markdown)*.
