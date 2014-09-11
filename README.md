@@ -18,18 +18,17 @@ Basic usage
 ```js
 var lixslt = require('libxslt');
 
-var stylesheet = libxslt.parse(stylesheetString);
+libxslt.parse(stylesheetString, function(err, stylesheet){
+  var params = {
+    MyParam: 'my value'
+  };
 
-var params = {
-	MyParam: 'my value'
-};
-
-// 'params' parameter is optional
-stylesheet.apply(documentString, params, function(err, result){
-	// err contains any error from parsing the document or applying the stylesheet
-	// result is a string containing the result of the transformation
+  // 'params' parameter is optional
+  stylesheet.apply(documentString, params, function(err, result){
+    // err contains any error from parsing the document or applying the stylesheet
+    // result is a string containing the result of the transformation
+  });  
 });
-
 ```
 
 Libxmljs integration
@@ -57,10 +56,17 @@ This is only useful if you already needed to parse a document before applying th
 Or if you wish to be returned a document instead of a string for ulterior manipulations.
 In these cases you will prevent extraneous parsings and serializations.	
 
+Includes
+--------
+
+XSL includes are supported but relative paths must be given from the execution directory, usually the root of the project.
+
+Includes are resolved when parsing the stylesheet by libxml. Therefore the parsing task becomes IO bound, which is why you should not use synchronous parsing when you expect some includes.
+
 Sync or async
 -------------
 
-The same *apply()* function can be used in synchronous mode simply by removing the callback parameter.
+The same *parse()* and *apply()* functions can be used in synchronous mode simply by removing the callback parameter.
 In this case if a parsing error occurs it will be thrown.
 
 ```js
@@ -72,7 +78,7 @@ var result = stylesheet.apply(documentString);
 
 ```
 
-The asynchronous function uses the [libuv work queue](http://nikhilm.github.io/uvbook/threads.html#libuv-work-queue)
+The asynchronous functions use the [libuv work queue](http://nikhilm.github.io/uvbook/threads.html#libuv-work-queue)
 to provide parallelized computation in node.js worker threads. This makes it non-blocking for the main event loop of node.js.
 
 Note that libxmljs parsing doesn't use the work queue, so only a part of the process is actually parallelized.
@@ -85,9 +91,13 @@ To run it use:
 This is an example of its results with an intel core i5 3.1GHz:
 
 ```
-10000 synchronous apply from parsed doc			 		in 331ms = 30211/s
-10000 asynchronous apply in series from parsed doc		in 538ms = 18587/s
-10000 asynchronous apply in parallel from parsed doc	in 217ms = 46083/s
+10000 synchronous parse from parsed doc                in 52ms = 192308/s
+10000 asynchronous parse in series from parsed doc     in 229ms = 43668/s
+10000 asynchronous parse in parallel from parsed doc   in 56ms = 178571/s
+10000 synchronous apply from parsed doc                in 329ms = 30395/s
+10000 asynchronous apply in series from parsed doc     in 569ms = 17575/s
+10000 asynchronous apply in parallel from parsed doc   in 288ms = 34722/s
+
 ```
 
 Observations:
@@ -99,6 +109,7 @@ Conclusion:
   - use asynchronous by default it will be kinder to your main event loop and is pretty fast anyway.
   - use synchronous only if you really want the highest performance and expect low concurrency.
   - of course you can also use synchronous simply to reduce code depth. If you don't expect a huge load it will be ok.
+  - DO NOT USE synchronous parsing if there is some includes in your XSL stylesheets.
 
 Environment compatibility
 -------------------------

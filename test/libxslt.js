@@ -5,24 +5,41 @@ var libxmljs = require("libxmljs");
 
 var libxslt = require('../index');
 
-describe('node-libxslt bindings', function() {
+describe('node-libxslt', function() {
 	var stylesheetSource;
-	before(function(callback){
-		fs.readFile('./test/resources/cd.xsl', 'utf8', function(err, data){
+	before(function(callback) {
+		fs.readFile('./test/resources/cd.xsl', 'utf8', function(err, data) {
 			stylesheetSource = data;
 			callback(err);
 		});
 	});
 	var docSource;
-	before(function(callback){
-		fs.readFile('./test/resources/cd.xml', 'utf8', function(err, data){
+	before(function(callback) {
+		fs.readFile('./test/resources/cd.xml', 'utf8', function(err, data) {
 			docSource = data;
 			callback(err);
 		});
 	});
 
+	var stylesheetIncludeSource;
+	before(function(callback) {
+		fs.readFile('./test/resources/xslinclude.xsl', 'utf8', function(err, data) {
+			stylesheetIncludeSource = data;
+			callback(err);
+		});
+	});
+
+	var doc2Source;
+	before(function(callback) {
+		fs.readFile('./test/resources/collection.xml', 'utf8', function(err, data) {
+			doc2Source = data;
+			callback(err);
+		});
+	});
+
 	var stylesheet;
-	describe('stylesheet function', function() {
+	var stylesheetInclude;
+	describe('synchronous parse function', function() {
 		it('should parse a stylesheet from a libxmljs xml document', function() {
 			var stylesheetDoc = libxmljs.parseXml(stylesheetSource);
 			stylesheet = libxslt.parse(stylesheetDoc);
@@ -32,6 +49,11 @@ describe('node-libxslt bindings', function() {
 			stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.should.be.type('object');
 		});
+		it('should parse a stylesheet with a include from a xml string', function() {
+			var stylesheetDoc = libxmljs.parseXml(stylesheetIncludeSource);
+			stylesheetInclude = libxslt.parse(stylesheetDoc);
+			stylesheetInclude.should.be.type('object');
+		});
 		it('should throw an error when parsing invalid stylesheet', function() {
 			(function() {
 				libxslt.parse('this is not a stylesheet!');
@@ -39,7 +61,36 @@ describe('node-libxslt bindings', function() {
 		});
 	});
 
-	describe('Synchronous Stylesheet.apply function', function() {
+	describe('asynchronous parse function', function() {
+		it('should parse a stylesheet from a libxmljs xml document', function(callback) {
+			var stylesheetDoc = libxmljs.parseXml(stylesheetSource);
+			libxslt.parse(stylesheetDoc, function(err, stylesheet) {
+				stylesheet.should.be.type('object');
+				callback(err);
+			});
+		});
+		it('should parse a stylesheet from a xml string', function(callback) {
+			libxslt.parse(stylesheetSource, function(err, stylesheet) {
+				stylesheet.should.be.type('object');
+				callback(err);
+			});
+		});
+		it('should parse a stylesheet with a include from a xml string', function(callback) {
+			var stylesheetDoc = libxmljs.parseXml(stylesheetIncludeSource);
+			libxslt.parse(stylesheetDoc, function(err, stylesheet) {
+				stylesheet.should.be.type('object');
+				callback(err);
+			});
+		});
+		it('should return an error when parsing invalid stylesheet', function(callback) {
+			libxslt.parse('this is not a stylesheet!', function(err){
+				should.exist(err);
+				callback();
+			});
+		});
+	});
+
+	describe('synchronous apply function', function() {
 		it('should apply a stylesheet to a libxmljs xml document', function() {
 			var doc = libxmljs.parseXml(docSource);
 			var result = stylesheet.apply(doc);
@@ -52,29 +103,37 @@ describe('node-libxslt bindings', function() {
 			result.should.match(/<td>Bob Dylan<\/td>/);
 		});
 		it('should apply a stylesheet with a parameter', function() {
-			var result = stylesheet.apply(docSource, {MyParam: 'MyParamValue'});
+			var result = stylesheet.apply(docSource, {
+				MyParam: 'MyParamValue'
+			});
 			result.should.be.type('string');
 			result.should.match(/<p>My param: MyParamValue<\/p>/);
 		});
+		it('should apply a stylesheet with a include to a xml string', function(callback) {
+			stylesheetInclude.apply(doc2Source, function(err, result) {
+				result.should.be.type('string');
+				result.should.match(/Title - Lover Birds/);
+				callback();
+			});
+		});
 	});
 
-	// TODO Asynchronous implementation almost ok, but generates segfault.
-	describe('Asynchronous Stylesheet.apply function', function() {
+	describe('asynchronous apply function', function() {
 		it('should apply a stylesheet to a libxmljs xml document', function(callback) {
 			var doc = libxmljs.parseXml(docSource);
-			stylesheet.apply(doc, function(err, result){
+			stylesheet.apply(doc, function(err, result) {
 				result.should.be.type('object');
 				result.toString().should.match(/<td>Bob Dylan<\/td>/);
 				callback();
 			});
 		});
 		it('should apply a stylesheet to a xml string', function(callback) {
-			stylesheet.apply(docSource, function(err, result){
+			stylesheet.apply(docSource, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
 				callback();
 			});
 		});
 	});
-	
+
 });

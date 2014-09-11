@@ -30,8 +30,53 @@ NAN_METHOD(StylesheetSync) {
         return NanThrowError("Could not parse XML string as XSLT stylesheet");
     }
 
-	Local<Object> stylesheetWrapper = Stylesheet::New(stylesheet);
+    Local<Object> stylesheetWrapper = Stylesheet::New(stylesheet);
   	NanReturnValue(stylesheetWrapper);
+}
+
+// for memory the segfault i previously fixed were due to xml documents being deleted
+// by garbage collector before their associated stylesheet.
+class StylesheetWorker : public NanAsyncWorker {
+ public:
+  StylesheetWorker(libxmljs::XmlDocument* doc, NanCallback *callback)
+    : NanAsyncWorker(callback), doc(doc) {}
+  ~StylesheetWorker() {}
+
+  // Executed inside the worker-thread.
+  // It is not safe to access V8, or V8 data structures
+  // here, so everything we need for input and output
+  // should go on `this`.
+  void Execute () {
+    result = xsltParseStylesheetDoc(doc->xml_obj);
+  }
+
+  // Executed when the async work is complete
+  // this function will be run inside the main event loop
+  // so it is safe to use V8 again
+  void HandleOKCallback () {
+    NanScope();
+    if (!result) {
+        Local<Value> argv[] = { NanError("Failed to parse stylesheet") };
+        callback->Call(2, argv);
+    } else {
+        Local<Object> resultWrapper = Stylesheet::New(result);
+        Local<Value> argv[] = { NanNull(), resultWrapper };
+        callback->Call(2, argv);
+    }
+  };
+
+ private:
+  libxmljs::XmlDocument* doc;
+  xsltStylesheetPtr result;
+};
+
+NAN_METHOD(StylesheetAsync) {
+    NanScope();
+
+    libxmljs::XmlDocument* doc = node::ObjectWrap::Unwrap<libxmljs::XmlDocument>(args[0]->ToObject());
+    NanCallback *callback = new NanCallback(args[1].As<Function>());
+    NanAsyncQueueWorker(new StylesheetWorker(doc, callback));
+    NanReturnUndefined();
 }
 
 // duplicate from https://github.com/bsuh/node_xslt/blob/master/node_xslt.cc
@@ -84,7 +129,6 @@ NAN_METHOD(ApplySync) {
   	NanReturnUndefined();
 }
 
-// TODO Asynchronous implementation almost ok, but generates segfault.
 // for memory the segfault i previously fixed were due to xml documents being deleted
 // by garbage collector before their associated stylesheet.
 class ApplyWorker : public NanAsyncWorker {
@@ -156,6 +200,7 @@ NAN_METHOD(ApplyAsync) {
 void InitAll(Handle<Object> exports) {
   	Stylesheet::Init(exports);
   	exports->Set(NanNew<String>("stylesheetSync"), NanNew<FunctionTemplate>(StylesheetSync)->GetFunction());
+    exports->Set(NanNew<String>("stylesheetAsync"), NanNew<FunctionTemplate>(StylesheetAsync)->GetFunction());
   	exports->Set(NanNew<String>("applySync"), NanNew<FunctionTemplate>(ApplySync)->GetFunction());
     exports->Set(NanNew<String>("applyAsync"), NanNew<FunctionTemplate>(ApplyAsync)->GetFunction());
 }

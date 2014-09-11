@@ -57,10 +57,20 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 
 exports.parse = function(source, callback) {
 	// stylesheet can be given as a string or a pre-parsed xml document
-	if (typeof source === 'string') source = libxmljs.parseXml(source);
+	if (typeof source === 'string') {
+		try {
+			source = libxmljs.parseXml(source);
+		} catch (err) {
+			if (callback) return callback(err);
+			throw err;
+		}
+	}
 	
 	if (callback) {
-		//return binding.stylesheetAsync(source);
+		binding.stylesheetAsync(source, function(err, stylesheet){
+			if (err) return callback(err);
+			callback(null, new Stylesheet(source, stylesheet));
+		});
 	} else {
 		return new Stylesheet(source, binding.stylesheetSync(source));
 	}

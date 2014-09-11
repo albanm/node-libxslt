@@ -20,18 +20,58 @@ var bench = function(name, iterations, f) {
 	};
 };
 
-var stylesheetParsingStr = function(iterations, callback) {
+var stylesheetSyncParsingStr = function(iterations, callback) {
 	for (var i = 0; i < iterations; i++) {
 		libxslt.parse(stylesheetStr);
 	}
 	callback();
 };
 
-var stylesheetParsingObj = function(iterations, callback) {
+var stylesheetSyncParsingObj = function(iterations, callback) {
 	for (var i = 0; i < iterations; i++) {
 		libxslt.parse(stylesheetObj);
 	}
 	callback();
+};
+
+var stylesheetAsyncSeriesParsingStr = function(iterations, callback) {
+	var i = 0;
+	async.eachSeries(new Array(iterations), function(u, callbackEach) {
+		libxslt.parse(stylesheetStr, function(err, result) {
+			i++;
+			callbackEach(err);
+		});
+	}, callback);
+};
+
+var stylesheetAsyncSeriesParsingObj = function(iterations, callback) {
+	var i = 0;
+	async.eachSeries(new Array(iterations), function(u, callbackEach) {
+		libxslt.parse(stylesheetObj, function(err, result) {
+			i++;
+			callbackEach(err);
+		});
+	}, callback); 
+};
+
+var stylesheetAsyncParallelParsingStr = function(iterations, callback) {
+	var i = 0;
+	async.eachLimit(new Array(iterations), 10, function(u, callbackEach) {
+		libxslt.parse(stylesheetStr, function(err, result) {
+			i++;
+			callbackEach(err);
+		});
+	}, callback);
+};
+
+var stylesheetAsyncParallelParsingObj = function(iterations, callback) {
+	var i = 0;
+	async.eachLimit(new Array(iterations), 10, function(u, callbackEach) {
+		libxslt.parse(stylesheetObj, function(err, result) {
+			i++;
+			callbackEach(err);
+		});
+	}, callback); 
 };
 
 var applySyncStr = function(iterations, callback) {
@@ -90,12 +130,21 @@ var applyAsyncParallelObj = function(iterations, callback) {
 
 var iterations = 10000;
 async.series([
-	//bench('stylesheet parsing from string\t\t\t', iterations, stylesheetParsingStr),
-	//bench('stylesheet parsing from parsed doc\t\t\t', iterations, stylesheetParsingObj),
+	//bench('synchronous parse from string\t\t\t', iterations, stylesheetSyncParsingStr),
+	bench('synchronous parse from parsed doc\t\t\t', iterations, stylesheetSyncParsingObj),
+
+	//bench('asynchronous parse in series from string\t\t\t', iterations, stylesheetAsyncSeriesParsingStr),
+	bench('asynchronous parse in series from parsed doc\t', iterations, stylesheetAsyncSeriesParsingObj),
+
+	//bench('asynchronous parse in parallel from string\t\t\t', iterations, stylesheetAsyncParallelParsingStr),
+	bench('asynchronous parse in parallel from parsed doc\t', iterations, stylesheetAsyncParallelParsingObj),
+
 	//bench('synchronous apply from string\t\t\t', iterations, applySyncStr),
 	bench('synchronous apply from parsed doc\t\t\t', iterations, applySyncObj),
+
 	//bench('asynchronous apply in series from string\t\t', iterations, applyAsyncSeriesStr),
 	bench('asynchronous apply in series from parsed doc\t', iterations, applyAsyncSeriesObj),
+
 	//bench('asynchronous apply in parallel from string\t', iterations, applyAsyncParallelStr),
 	bench('asynchronous apply in parallel from parsed doc\t', iterations, applyAsyncParallelObj)
 ]);
