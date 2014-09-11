@@ -4,7 +4,8 @@
   "description": "Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha -R spec",
+    "docs": "jsdoc2md index.js --template readme.hbs > README.md"
   },
   "keywords": [
     "xml",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "async": "~0.9.0",
+    "jsdoc-to-markdown": "^0.5.7",
     "mocha": "^1.21.4",
     "should": "~4.0.4"
   }

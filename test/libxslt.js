@@ -61,6 +61,16 @@ describe('node-libxslt', function() {
 		});
 	});
 
+	describe('parseFile function', function() {
+		it('should parse a stylesheet from a file', function(callback) {
+			libxslt.parseFile('./test/resources/cd.xsl', function(err, stylesheet) {
+				console.log(err);
+				stylesheet.should.be.type('object');
+				callback(err);
+			});
+		});
+	});
+
 	describe('asynchronous parse function', function() {
 		it('should parse a stylesheet from a libxmljs xml document', function(callback) {
 			var stylesheetDoc = libxmljs.parseXml(stylesheetSource);
@@ -83,7 +93,7 @@ describe('node-libxslt', function() {
 			});
 		});
 		it('should return an error when parsing invalid stylesheet', function(callback) {
-			libxslt.parse('this is not a stylesheet!', function(err){
+			libxslt.parse('this is not a stylesheet!', function(err) {
 				should.exist(err);
 				callback();
 			});
@@ -136,4 +146,13 @@ describe('node-libxslt', function() {
 		});
 	});
 
+	describe('applyToFile function', function() {
+		it('should apply a stylesheet to a xml file', function(callback) {
+			stylesheet.applyToFile('./test/resources/cd.xml', function(err, result) {
+				result.should.be.type('string');
+				result.should.match(/<td>Bob Dylan<\/td>/);
+				callback();
+			});
+		});
+	});
 });

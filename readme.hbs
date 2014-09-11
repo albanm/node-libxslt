@@ -120,82 +120,9 @@ Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you
 
 API Reference
 =============
-Node.js bindings for libxslt compatible with libxmljs
-
-**Members**
-
-* [libxslt](#module_libxslt)
-  * [libxslt.parse(source, [callback])](#module_libxslt.parse)
-  * [libxslt.parseFile(sourcePath, [callback])](#module_libxslt.parseFile)
-  * [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
-    * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
-    * [stylesheet.apply(source, [params], [callback])](#module_libxslt..Stylesheet#apply)
-    * [stylesheet.applyToFile(sourcePath, [params], [callback])](#module_libxslt..Stylesheet#applyToFile)
-
-<a name="module_libxslt.parse"></a>
-##libxslt.parse(source, [callback])
-Parse a XSL stylesheet
-
-If no callback is given the function will run synchronously and return the result or throw an error.
-
-**Params**
-
-- source `string` | `Document` - The content of the stylesheet as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
-- \[callback\] <code>[parseCallback](#parseCallback)</code> - The callback that handles the response.  
-
-**Returns**: `Stylesheet` - Only if no callback is given.  
-<a name="module_libxslt.parseFile"></a>
-##libxslt.parseFile(sourcePath, [callback])
-Parse a XSL stylesheet
-
-**Params**
-
-- sourcePath `stringPath` - The path of the file  
-- \[callback\] <code>[parseFileCallback](#parseFileCallback)</code> - The callback that handles the response.  
-
-<a name="module_libxslt..Stylesheet"></a>
-##class: libxslt~Stylesheet
-**Members**
-
-* [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
-  * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
-  * [stylesheet.apply(source, [params], [callback])](#module_libxslt..Stylesheet#apply)
-  * [stylesheet.applyToFile(sourcePath, [params], [callback])](#module_libxslt..Stylesheet#applyToFile)
-
-<a name="new_module_libxslt..Stylesheet"></a>
-###new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)
-A compiled stylesheet. Do not call this constructor, instead use parse or parseFile.
-
-store both the source document and the parsed stylesheet
-if we don't store the stylesheet doc it will be deleted by garbage collector and it will result in segfaults.
-
-**Params**
-
-- stylesheetDoc `Document` - XML document source of the stylesheet  
-- stylesheetObj `Document` - Simple wrapper of a libxslt stylesheet  
-
-**Scope**: inner class of [libxslt](#module_libxslt)  
-<a name="module_libxslt..Stylesheet#apply"></a>
-###stylesheet.apply(source, [params], [callback])
-Apply a stylesheet to a XML document
-
-If no callback is given the function will run synchronously and return the result or throw an error.
-
-**Params**
-
-- source `string` | `Document` - The XML content to apply the stylesheet to given as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
-- \[params\] `object` - Parameters passed to the stylesheet ({@linkhttp://www.w3schools.com/xsl/el_with-param.asp})  
-- \[callback\] <code>[applyCallback](#Stylesheet..applyCallback)</code> - The callback that handles the response.  
-
-**Returns**: `string` | `Document` - Only if no callback is given. Type is the same as the source param.  
-<a name="module_libxslt..Stylesheet#applyToFile"></a>
-###stylesheet.applyToFile(sourcePath, [params], [callback])
-Apply a stylesheet to a XML file
-
-**Params**
-
-- sourcePath `string` - The path of the file to read  
-- \[params\] `object` - Parameters passed to the stylesheet ({@linkhttp://www.w3schools.com/xsl/el_with-param.asp})  
-- \[callback\] <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response.  
+{{#module name="libxslt"~}}
+  {{>body~}}
+  {{>exported~}}
+{{/module~}}
 
 *documented by [jsdoc-to-markdown](https://github.com/75lb/jsdoc-to-markdown)*.
