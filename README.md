@@ -16,7 +16,7 @@ Basic usage
 -----------
 
 ```js
-var lixslt = require('libxslt');
+var libxslt = require('libxslt');
 
 libxslt.parse(stylesheetString, function(err, stylesheet){
   var params = {
