@@ -5,6 +5,9 @@
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#include <libxslt/extensions.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
 #include <libexslt/exslt.h>
 
 // includes from libxmljs
@@ -19,10 +22,7 @@ using namespace v8;
 NAN_METHOD(StylesheetSync) {
   	NanScope();
 
-    // From libxml document
     libxmljs::XmlDocument* doc = node::ObjectWrap::Unwrap<libxmljs::XmlDocument>(args[0]->ToObject());
-    // From string
-    //libxmljs::XmlDocument* doc = libxmljs::XmlDocument::FromXml(args);
 
     xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc->xml_obj);
     // TODO fetch actual error. 
@@ -111,15 +111,20 @@ NAN_METHOD(ApplySync) {
     char** params = PrepareParams(paramsArray);
 
     xmlDoc* result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
+    //xsltTransformContext* transformContext = xsltNewTransformContext(stylesheet->stylesheet_obj, docSource->xml_obj);
+    
+    //xsltRegisterExtFunction(transformContext, (const xmlChar *)"foo", NULL, xsltExtFunctionTest);
+
+    //xmlDoc* result = xsltApplyStylesheetUser(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params, NULL, NULL, transformContext);
     if (!result) {
         freeArray(params, paramsArray->Length());
         return NanThrowError("Failed to apply stylesheet");
     }
 
     // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
-	// but passing a document by reference and modifying its content works fine
+    // but passing a document by reference and modifying its content works fine
     // replace the empty document in docResult with the result of the stylesheet
-	docResult->xml_obj->_private = NULL;
+	  docResult->xml_obj->_private = NULL;
     xmlFreeDoc(docResult->xml_obj);
     docResult->xml_obj = result;
     result->_private = docResult;
@@ -172,13 +177,13 @@ class ApplyWorker : public NanAsyncWorker {
     }
   };
 
- private:
-  Stylesheet* stylesheet;
-  libxmljs::XmlDocument* docSource;
-  char** params;
-  int paramsLength;
-  libxmljs::XmlDocument* docResult;
-  xmlDoc* result;
+  private:
+    Stylesheet* stylesheet;
+    libxmljs::XmlDocument* docSource;
+    char** params;
+    int paramsLength;
+    libxmljs::XmlDocument* docResult;
+    xmlDoc* result;
 };
 
 NAN_METHOD(ApplyAsync) {
@@ -196,6 +201,48 @@ NAN_METHOD(ApplyAsync) {
     NanReturnUndefined();
 }
 
+//static void xsltExtFunctionTest(xmlXPathParserContextPtr ctxt, int nargs)
+//    {
+//        printf("DEBUG: function called !\n");
+//        valuePush(ctxt, xmlXPathNewString((const xmlChar *)"Hello world"));
+//        //return "TEST";
+//    }
+
+class MyFunctor {
+   public:
+      //Matcher(int m) : target(m) {}
+      void operator()(xmlXPathParserContextPtr ctxt, int nargs) {
+        printf("DEBUG: function called !\n");
+        Local<Value> argv[] = { NanNull() };
+        //callback->Call(1, argv);
+        valuePush(ctxt, xmlXPathNewString((const xmlChar *)"Hello world"));
+      }
+};
+
+NAN_METHOD(RegisterFunction) {
+    NanScope();
+    NanUtf8String *name = new NanUtf8String(args[0]);
+    NanUtf8String *ns = new NanUtf8String(args[1]);
+    //NanCallback *callback = new NanCallback(args[2].As<Function>());
+
+    printf("DEBUG: register function\n");
+
+    // use a lambda function. This requires C++11
+    //auto func = [&callback] (xmlXPathParserContextPtr ctxt, int nargs) {
+    //  printf("DEBUG: function called !\n");
+    //  Local<Value> argv[] = { NanNull() };
+    //  callback->Call(1, argv);
+    //  valuePush(ctxt, xmlXPathNewString((const xmlChar *)"Hello world"));
+    //};
+
+    MyFunctor func();
+
+    xsltRegisterExtModuleFunction((const xmlChar *)**name, (const xmlChar *)**ns, (xmlXPathFunction)func);
+
+    NanReturnUndefined();
+}
+
+
 // Compose the module by assigning the methods previously prepared
 void InitAll(Handle<Object> exports) {
   	Stylesheet::Init(exports);
@@ -203,5 +250,6 @@ void InitAll(Handle<Object> exports) {
     exports->Set(NanNew<String>("stylesheetAsync"), NanNew<FunctionTemplate>(StylesheetAsync)->GetFunction());
   	exports->Set(NanNew<String>("applySync"), NanNew<FunctionTemplate>(ApplySync)->GetFunction());
     exports->Set(NanNew<String>("applyAsync"), NanNew<FunctionTemplate>(ApplyAsync)->GetFunction());
+    exports->Set(NanNew<String>("registerFunction"), NanNew<FunctionTemplate>(RegisterFunction)->GetFunction());
 }
 NODE_MODULE(node_libxslt, InitAll);

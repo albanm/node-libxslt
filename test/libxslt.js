@@ -155,4 +155,25 @@ describe('node-libxslt', function() {
 			});
 		});
 	});
+
+	describe('registerFunction function', function() {
+		var stylesheetExtensions;
+		before(function(callback) {
+			fs.readFile('./test/resources/cd_extensions.xsl', 'utf8', function(err, data) {
+				if (err) return callback(err);
+				stylesheetExtensions = libxslt.parse(data);
+				callback();
+			});
+		});
+		it('should apply the function when running transformation', function(callback) {
+			libxslt.registerFunction('foo', 'http://example.com/extensions', function() {
+				console.log('YEAH!!!');
+				return 'Hello world';
+			});
+			var result = stylesheetExtensions.apply(docSource);
+			result.should.be.type('string');
+			result.should.match(/<td>Hello world<\/td>/);
+			callback();
+		});
+	});
 });

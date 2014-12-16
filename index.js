@@ -17,7 +17,7 @@ var binding = require('bindings')('node-libxslt');
  * @param {Document} stylesheetDoc - XML document source of the stylesheet
  * @param {Document} stylesheetObj - Simple wrapper of a libxslt stylesheet
  */
-var Stylesheet = function(stylesheetDoc, stylesheetObj){
+var Stylesheet = function(stylesheetDoc, stylesheetObj) {
 	this.stylesheetDoc = stylesheetDoc;
 	this.stylesheetObj = stylesheetObj;
 };
@@ -41,9 +41,9 @@ exports.parse = function(source, callback) {
 			throw err;
 		}
 	}
-	
+
 	if (callback) {
-		binding.stylesheetAsync(source, function(err, stylesheet){
+		binding.stylesheetAsync(source, function(err, stylesheet) {
 			if (err) return callback(err);
 			callback(null, new Stylesheet(source, stylesheet));
 		});
@@ -65,7 +65,7 @@ exports.parse = function(source, callback) {
  * @param {parseFileCallback} callback - The callback that handles the response. Expects err and Stylesheet object.
  */
 exports.parseFile = function(sourcePath, callback) {
-	fs.readFile(sourcePath, 'utf8', function(err, data){
+	fs.readFile(sourcePath, 'utf8', function(err, data) {
 		if (err) return callback(err);
 		exports.parse(data, callback);
 	});
@@ -76,6 +76,14 @@ exports.parseFile = function(sourcePath, callback) {
  * @param {error} [err]
  * @param {Stylesheet} [stylesheet]
  */
+
+/**
+ * Register an extension function to be used in xpath expressions of a stylesheet
+ * @param {string} name
+ * @param {string} namespace
+ * @param {function} fn
+ */
+exports.registerFunction = binding.registerFunction;
 
 /**
  * Apply a stylesheet to a XML document
@@ -95,7 +103,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 	}
 	params = params || {};
 
-	for(var p in params) {
+	for (var p in params) {
 		// string parameters must be surrounded by quotes to be usable by the stylesheet
 		if (typeof params[p] === 'string') params[p] = '\'' + params[p] + '\'';
 	}
@@ -114,7 +122,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 
 	// flatten the params object in an array
 	var paramsArray = [];
-	for(var key in params) {
+	for (var key in params) {
 		paramsArray.push(key);
 		paramsArray.push(params[key]);
 	}
@@ -124,12 +132,12 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 	var result = new libxmljs.Document();
 
 	if (callback) {
-		binding.applyAsync(this.stylesheetObj, source, paramsArray, result, function(err){
+		binding.applyAsync(this.stylesheetObj, source, paramsArray, result, function(err) {
 			if (err) return callback(err);
 			callback(null, outputString ? result.toString() : result);
 		});
 	} else {
-		binding.applySync(this.stylesheetObj, source, paramsArray, result);	
+		binding.applySync(this.stylesheetObj, source, paramsArray, result);
 		return outputString ? result.toString() : result;
 	}
 };
@@ -149,7 +157,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
  */
 Stylesheet.prototype.applyToFile = function(sourcePath, params, callback) {
 	var that = this;
-	fs.readFile(sourcePath, 'utf8', function(err, data){
+	fs.readFile(sourcePath, 'utf8', function(err, data) {
 		if (err) return callback(err);
 		that.apply(data, params, callback);
 	});
