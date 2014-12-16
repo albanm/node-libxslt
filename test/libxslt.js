@@ -154,21 +154,14 @@ describe('node-libxslt', function() {
 			});
 		});
 	});
-});
 
-describe('node-libxslt disable-output-escaping issue', function() {
-  it('should apply a stylesheet to a xml file', function() {
-    var xmlToTest = fs.readFileSync('test/resources/disable-output-escaping.xml');
-    var xsltXmlToTest = fs.readFileSync('test/resources/disable-output-escaping.xsl');
-    var expectedOutput = fs.readFileSync('test/resources/disable-output-escaping.output').toString();
-    var xmlDoc = libxmljs.parseXml(xmlToTest);
-    var xsltXmlDoc = libxmljs.parseXml(xsltXmlToTest);
-    var xsltDoc = libxslt.parse(xsltXmlDoc);
-
-    var resultXml = xsltDoc.apply(xmlDoc);
-    var resultString = resultXml.toString();
-
-    resultString.should.be.type('string');
-    resultString.should.match(expectedOutput);
-  });
+	describe('disable-output-escaping attribute', function() {
+		it('should be interpreted by a stylesheet', function() {
+			var stylesheetStr = fs.readFileSync('test/resources/disable-output-escaping.xsl', 'utf8');
+			var stylesheetEsc = libxslt.parse(stylesheetStr);
+			var result = stylesheetEsc.apply('<root/>');
+			result.should.match(/<foo\/>/);
+			result.should.match(/&lt;bar\/&gt;/);
+		});
+	});
 });

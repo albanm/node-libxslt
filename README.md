@@ -42,7 +42,7 @@ It is possible to work with libxmljs documents instead of strings:
 var lixslt = require('libxslt');
 var libxmljs = require('libxmljs');
 
-var stylesheetObj = libxmljs.parseXml(stylesheetString);
+var stylesheetObj = libxmljs.parseXml(stylesheetString, { nocdata: true });
 var stylesheet = libxslt.parse(stylesheetObj);
 
 var document = libxmljs.parseXml(documentString);

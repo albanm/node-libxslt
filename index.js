@@ -35,7 +35,7 @@ exports.parse = function(source, callback) {
 	// stylesheet can be given as a string or a pre-parsed xml document
 	if (typeof source === 'string') {
 		try {
-			source = libxmljs.parseXml(source);
+			source = libxmljs.parseXml(source, { nocdata: true });
 		} catch (err) {
 			if (callback) return callback(err);
 			throw err;
