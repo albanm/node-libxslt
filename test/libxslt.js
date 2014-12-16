@@ -64,7 +64,6 @@ describe('node-libxslt', function() {
 	describe('parseFile function', function() {
 		it('should parse a stylesheet from a file', function(callback) {
 			libxslt.parseFile('./test/resources/cd.xsl', function(err, stylesheet) {
-				console.log(err);
 				stylesheet.should.be.type('object');
 				callback(err);
 			});
