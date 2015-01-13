@@ -164,4 +164,17 @@ describe('node-libxslt', function() {
 			result.should.match(/&lt;bar\/&gt;/);
 		});
 	});
+
+	describe('libexslt bindings', function(){
+		it('should expose EXSLT functions', function(callback){
+			libxslt.parseFile('test/resources/min-value.xsl', function(err, stylesheet){
+				should.not.exist(err);
+				stylesheet.applyToFile('test/resources/values.xml', function(err, result){
+					should.not.exist(err);
+					result.should.match(/Minimum: 4/);
+					callback();
+				});
+			});
+		});
+	});
 });

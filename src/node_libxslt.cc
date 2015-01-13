@@ -5,7 +5,6 @@
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
-#include <libexslt/exslt.h>
 
 // includes from libxmljs
 #include <xml_syntax_error.h>
@@ -72,7 +71,6 @@ class StylesheetWorker : public NanAsyncWorker {
 
 NAN_METHOD(StylesheetAsync) {
     NanScope();
-
     libxmljs::XmlDocument* doc = node::ObjectWrap::Unwrap<libxmljs::XmlDocument>(args[0]->ToObject());
     NanCallback *callback = new NanCallback(args[1].As<Function>());
     NanAsyncQueueWorker(new StylesheetWorker(doc, callback));
@@ -196,6 +194,11 @@ NAN_METHOD(ApplyAsync) {
     NanReturnUndefined();
 }
 
+NAN_METHOD(RegisterEXSLT) {
+    exsltRegisterAll();
+    NanReturnUndefined();
+}
+
 // Compose the module by assigning the methods previously prepared
 void InitAll(Handle<Object> exports) {
   	Stylesheet::Init(exports);
@@ -203,5 +206,6 @@ void InitAll(Handle<Object> exports) {
     exports->Set(NanNew<String>("stylesheetAsync"), NanNew<FunctionTemplate>(StylesheetAsync)->GetFunction());
   	exports->Set(NanNew<String>("applySync"), NanNew<FunctionTemplate>(ApplySync)->GetFunction());
     exports->Set(NanNew<String>("applyAsync"), NanNew<FunctionTemplate>(ApplyAsync)->GetFunction());
+    exports->Set(NanNew<String>("registerEXSLT"), NanNew<FunctionTemplate>(RegisterEXSLT)->GetFunction());
 }
 NODE_MODULE(node_libxslt, InitAll);

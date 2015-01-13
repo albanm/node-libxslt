@@ -7,6 +7,8 @@ var fs = require('fs');
 var libxmljs = require('libxmljs');
 var binding = require('bindings')('node-libxslt');
 
+binding.registerEXSLT();
+
 /**
  * A compiled stylesheet. Do not call this constructor, instead use parse or parseFile.
  *
