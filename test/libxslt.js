@@ -1,7 +1,6 @@
 var fs = require('fs');
 
 var should = require('should');
-var libxmljs = require("libxmljs");
 
 var libxslt = require('../index');
 
@@ -40,8 +39,8 @@ describe('node-libxslt', function() {
 	var stylesheet;
 	var stylesheetInclude;
 	describe('synchronous parse function', function() {
-		it('should parse a stylesheet from a libxmljs xml document', function() {
-			var stylesheetDoc = libxmljs.parseXml(stylesheetSource);
+		it('should parse a stylesheet from a libxslt.libxmljs xml document', function() {
+			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetSource);
 			stylesheet = libxslt.parse(stylesheetDoc);
 			stylesheet.should.be.type('object');
 		});
@@ -50,7 +49,7 @@ describe('node-libxslt', function() {
 			stylesheet.should.be.type('object');
 		});
 		it('should parse a stylesheet with a include from a xml string', function() {
-			var stylesheetDoc = libxmljs.parseXml(stylesheetIncludeSource);
+			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetIncludeSource);
 			stylesheetInclude = libxslt.parse(stylesheetDoc);
 			stylesheetInclude.should.be.type('object');
 		});
@@ -71,8 +70,8 @@ describe('node-libxslt', function() {
 	});
 
 	describe('asynchronous parse function', function() {
-		it('should parse a stylesheet from a libxmljs xml document', function(callback) {
-			var stylesheetDoc = libxmljs.parseXml(stylesheetSource);
+		it('should parse a stylesheet from a libxslt.libxmljs xml document', function(callback) {
+			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetSource);
 			libxslt.parse(stylesheetDoc, function(err, stylesheet) {
 				stylesheet.should.be.type('object');
 				callback(err);
@@ -85,7 +84,7 @@ describe('node-libxslt', function() {
 			});
 		});
 		it('should parse a stylesheet with a include from a xml string', function(callback) {
-			var stylesheetDoc = libxmljs.parseXml(stylesheetIncludeSource);
+			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetIncludeSource);
 			libxslt.parse(stylesheetDoc, function(err, stylesheet) {
 				stylesheet.should.be.type('object');
 				callback(err);
@@ -100,8 +99,8 @@ describe('node-libxslt', function() {
 	});
 
 	describe('synchronous apply function', function() {
-		it('should apply a stylesheet to a libxmljs xml document', function() {
-			var doc = libxmljs.parseXml(docSource);
+		it('should apply a stylesheet to a libxslt.libxmljs xml document', function() {
+			var doc = libxslt.libxmljs.parseXml(docSource);
 			var result = stylesheet.apply(doc);
 			result.should.be.type('object');
 			result.toString().should.match(/<td>Bob Dylan<\/td>/);
@@ -128,8 +127,8 @@ describe('node-libxslt', function() {
 	});
 
 	describe('asynchronous apply function', function() {
-		it('should apply a stylesheet to a libxmljs xml document', function(callback) {
-			var doc = libxmljs.parseXml(docSource);
+		it('should apply a stylesheet to a libxslt.libxmljs xml document', function(callback) {
+			var doc = libxslt.libxmljs.parseXml(docSource);
 			stylesheet.apply(doc, function(err, result) {
 				result.should.be.type('object');
 				result.toString().should.match(/<td>Bob Dylan<\/td>/);

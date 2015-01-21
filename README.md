@@ -36,11 +36,13 @@ Libxmljs integration
 
 Node-libxslt depends on [libxmljs](https://github.com/polotek/libxmljs/issues/226) in the same way that [libxslt](http://xmlsoft.org/libxslt/) depends on [libxml](http://xmlsoft.org/). This dependancy makes possible to bundle and to load in memory libxml only once for users of both libraries.
 
+The libxmljs module required by node-libxslt is exposed as ```require('libxslt').libxmljs```. This prevents depending on libxmljs twice which is not optimal and source of weird bugs.
+
 It is possible to work with libxmljs documents instead of strings:
 
 ```js
 var lixslt = require('libxslt');
-var libxmljs = require('libxmljs');
+var libxmljs = libxslt.libxmljs;
 
 var stylesheetObj = libxmljs.parseXml(stylesheetString, { nocdata: true });
 var stylesheet = libxslt.parse(stylesheetObj);

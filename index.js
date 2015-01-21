@@ -10,6 +10,11 @@ var binding = require('bindings')('node-libxslt');
 binding.registerEXSLT();
 
 /**
+ * The libxmljs module. Prevents the need for a user's code to require it a second time. Also prevent weird bugs.
+ */
+exports.libxmljs = libxmljs;
+
+/**
  * A compiled stylesheet. Do not call this constructor, instead use parse or parseFile.
  *
  * store both the source document and the parsed stylesheet
