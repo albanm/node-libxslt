@@ -199,6 +199,9 @@ NAN_METHOD(RegisterEXSLT) {
     NanReturnUndefined();
 }
 
+NAN_METHOD(RegisterFunction);
+NAN_METHOD(ShutdownOnExit);
+
 // Compose the module by assigning the methods previously prepared
 void InitAll(Handle<Object> exports) {
   	Stylesheet::Init(exports);
@@ -207,5 +210,7 @@ void InitAll(Handle<Object> exports) {
   	exports->Set(NanNew<String>("applySync"), NanNew<FunctionTemplate>(ApplySync)->GetFunction());
     exports->Set(NanNew<String>("applyAsync"), NanNew<FunctionTemplate>(ApplyAsync)->GetFunction());
     exports->Set(NanNew<String>("registerEXSLT"), NanNew<FunctionTemplate>(RegisterEXSLT)->GetFunction());
+    exports->Set(NanNew<String>("registerFunction"), NanNew<FunctionTemplate>(RegisterFunction)->GetFunction());
+    exports->Set(NanNew<String>("shutdownOnExit"), NanNew<FunctionTemplate>(ShutdownOnExit)->GetFunction());
 }
 NODE_MODULE(node_libxslt, InitAll);

@@ -176,4 +176,38 @@ describe('node-libxslt', function() {
 			});
 		});
 	});
+
+	describe('custom extension functions', function(){
+		var my_ns = "https://github.com/albanm/node-libxslt/issues/2";
+		var my_xsl =
+				('<xsl:stylesheet version="1.0"' +
+				 ' xmlns:xsl="http://www.w3.org/1999/XSL/Transform"' +
+				 ' xmlns:my="' + my_ns + '"' +
+				 ' extension-element-prefixes="my">' +
+				 '<xsl:template match="*">' +
+				 '<res><xsl:value-of select="my:foo(3,\'a\',1>0)"/></res>' +
+				 '</xsl:template>' +
+				 '</xsl:stylesheet>');
+		var stylesheet;
+		function foo() {
+			return JSON.stringify([].slice.call(arguments));
+		}
+		it('need to be registered', function() {
+			libxslt.registerFunction("foo", my_ns, foo);
+		});
+		it('can be referenced in stylesheets', function() {
+			// remember that we need extension-element-prefixes in libxslt
+			stylesheet = libxslt.parse(my_xsl);
+		});
+		it('can be called synchroneously', function() {
+			var res = stylesheet.apply('<input/>');
+			res.should.match(/<res>\[3,"a",true\]<\/res>/)
+		});
+		it('can be called asynchroneously', function() {
+			stylesheet.apply('<input/>', null, function(err, res) {
+				should.not.exist(err);
+				res.should.match(/<res>\[3,"a",true\]<\/res>/)
+			});
+		});
+	});
 });
