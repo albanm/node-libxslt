@@ -129,6 +129,7 @@ private:
     }
     v8::Handle<v8::Value> res = cb.Call(argc, argv.get());
     valuePush(ctxt, node2xpath(res));
+    uv_close(reinterpret_cast<uv_handle_t*>(&async), nullptr);
     // Now we signal the worker that the result is available
   }
 };
