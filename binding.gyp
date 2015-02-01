@@ -5,8 +5,8 @@
       "sources": [ "src/node_libxslt.cc", "src/stylesheet.cc" ],
       "include_dirs": ["<!(node -e \"require('nan')\")"],
       'dependencies': [
-      	'./deps/libxslt/libxslt.gyp:libxslt',
-      	'./deps/libxslt/libxslt.gyp:libexslt'
+      	'./deps/libxslt.gyp:libxslt',
+      	'./deps/libxslt.gyp:libexslt'
       ]
     }
   ]
