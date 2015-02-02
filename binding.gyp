@@ -7,7 +7,6 @@
         "src/stylesheet.cc",
         "src/extensions.cc"
       ],
-      "cflags" : [ "-std=c++11" ],
       "include_dirs": ["<!(node -e \"require('nan')\")"],
       'dependencies': [
       	'./deps/libxslt/libxslt.gyp:libxslt',

@@ -23,19 +23,25 @@
 class Module;
 
 // Global variable used as registry
-static std::map< std::basic_string<xmlChar>,
-                 std::unique_ptr<Module> > moduleMap;
+static std::map< std::basic_string<xmlChar>, Module* > moduleMap;
+typedef std::map< std::basic_string<xmlChar>, Module* >::iterator moduleMapIter;
 
 // Still looking for a more elegant way to identify the main event loop thread
-static decltype(uv_thread_self()) main_thread;
+#if NAUV_UVVERSION < 0x010000
+static unsigned long main_thread;
+#else
+static uv_thread_t main_thread;
+#endif
 
 static inline std::basic_string<xmlChar>
 stringNode2xml(v8::Handle<v8::Value> obj) {
   v8::Local<v8::String> jstr = obj->ToString();
   size_t len = jstr->Utf8Length();
-  std::unique_ptr<xmlChar[]> cstr(new xmlChar[len + 1]);
-  jstr->WriteUtf8(reinterpret_cast<char*>(cstr.get()));
-  return { cstr.get(), len };
+  xmlChar *cstr = new xmlChar[len + 1];
+  jstr->WriteUtf8(reinterpret_cast<char*>(cstr));
+  std::basic_string<xmlChar> str(cstr, len);
+  delete[] cstr;
+  return str;
 }
 
 static v8::Local<v8::Value> xpath2node(xmlXPathObjectPtr in) {
@@ -63,8 +69,14 @@ static xmlXPathObjectPtr node2xpath(v8::Handle<v8::Value> in) {
 
 class Module {
 public:
-  std::map< std::basic_string<xmlChar>,
-            std::unique_ptr<NanCallback> > functions;
+  ~Module() {
+    for (iter i = functions.begin(), e = functions.end();
+         i != e; ++i) {
+      delete i->second;
+    }
+  }
+  std::map< std::basic_string<xmlChar>, NanCallback* > functions;
+  typedef std::map< std::basic_string<xmlChar>, NanCallback* >::iterator iter;
 };
 
 // Compatibility function, since 59658a8 uv_thread_self() returns uv_thread_t
@@ -119,17 +131,17 @@ private:
     xmlXPathContextPtr pctxt = ctxt->context;
     NanCallback& cb =
       *moduleMap.at(pctxt->functionURI)->functions.at(pctxt->function);
-    std::unique_ptr<v8::Handle<v8::Value>[]> argv
-      (new v8::Handle<v8::Value>[argc]);
+    v8::Handle<v8::Value> *argv = new v8::Handle<v8::Value>[argc];
     int i = argc;
     while (i > 0) {
       xmlXPathObjectPtr xobj = valuePop(ctxt);
       argv[--i] = xpath2node(xobj);
       xmlXPathFreeObject(xobj);
     }
-    v8::Handle<v8::Value> res = cb.Call(argc, argv.get());
+    v8::Handle<v8::Value> res = cb.Call(argc, argv);
+    delete[] argv;
     valuePush(ctxt, node2xpath(res));
-    uv_close(reinterpret_cast<uv_handle_t*>(&async), nullptr);
+    uv_close(reinterpret_cast<uv_handle_t*>(&async), NULL);
     // Now we signal the worker that the result is available
   }
 };
@@ -145,7 +157,7 @@ static void evalFunction(xmlXPathParserContextPtr ctxt, int nargs) {
 static void* initFunc(xsltTransformContextPtr ctxt, const xmlChar *uri) {
   DBG("Context initialization started.");
   Module& module = *moduleMap.at(uri);
-  for (auto i = module.functions.begin(), e = module.functions.end();
+  for (Module::iter i = module.functions.begin(), e = module.functions.end();
        i != e; ++i) {
     xsltRegisterExtFunction(ctxt, i->first.c_str(),
                             uri, evalFunction);
@@ -168,16 +180,15 @@ NAN_METHOD(RegisterFunction) {
   DBG("Main thread is " << main_thread);
   std::basic_string<xmlChar> name = stringNode2xml(args[0]);
   std::basic_string<xmlChar> uri = stringNode2xml(args[1]);
-  std::unique_ptr<NanCallback> cb(new NanCallback(args[2].As<v8::Function>()));
-  auto i = moduleMap.find(uri);
+  NanCallback *cb = new NanCallback(args[2].As<v8::Function>());
+  moduleMapIter i = moduleMap.find(uri);
   if (i == moduleMap.end()) {
-    i = moduleMap.emplace(uri, nullptr).first;
-    i->second.reset(new Module());
+    i = moduleMap.insert(std::make_pair(uri, new Module())).first;
     xsltRegisterExtModule(i->first.c_str(), initFunc, shutdownFunc);
     DBG("Registered module " << (char*)i->first.c_str());
   }
   Module& mod = *(i->second);
-  mod.functions.emplace(name, std::move(cb));
+  mod.functions.insert(std::make_pair(name, cb)); // mod assumes ownership of cb
   DBG("Registered {" << (char*)uri.c_str() << "}" << (char*)name.c_str());
   NanReturnUndefined();
 }
@@ -188,8 +199,11 @@ NAN_METHOD(ShutdownOnExit) {
   // Otherwise the destructors of the persistent handles will segfault.
   // To avoid accidents, we unregister all our modules as well.
   NanScope();
-  for (auto i = moduleMap.begin(), e = moduleMap.end(); i != e; ++i)
+  for (moduleMapIter i = moduleMap.begin(), e = moduleMap.end();
+       i != e; ++i) {
     xsltUnregisterExtModule(i->first.c_str());
+    delete i->second;
+  }
   moduleMap.clear();
   NanReturnUndefined();
 }
