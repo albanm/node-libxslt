@@ -24,11 +24,11 @@
         },
       }
     },
-    'defines': ['HAVE_CONFIG_H','LIBXSLT_STATIC'],
+    'defines': ['HAVE_CONFIG_H','LIBXSLT_STATIC','WITH_MODULES'],
     'include_dirs': [
-      '.',
+      'libxslt/',
       # platform and arch-specific headers
-      'config/<(OS)/<(target_arch)',
+      'libxslt.config/<(OS)/<(target_arch)',
       '<@(xmljs_include_dirs)'
     ]
   },
@@ -37,27 +37,27 @@
       'target_name': 'libxslt',
       'type': 'static_library',
       'sources': [
-        'libxslt/attributes.c',
-        'libxslt/attrvt.c',
-        'libxslt/documents.c',
-        'libxslt/extensions.c',
-        'libxslt/extra.c',
-        'libxslt/functions.c',
-        'libxslt/imports.c',
-        'libxslt/keys.c',
-        'libxslt/namespaces.c',
-        'libxslt/numbers.c',
-        'libxslt/pattern.c',
-        'libxslt/preproc.c',
-        'libxslt/preproc.h',
-        'libxslt/security.c',
-        'libxslt/security.h',
-        'libxslt/templates.c',
-        'libxslt/transform.c',
-        'libxslt/variables.c',
-        'libxslt/xslt.c',
-        'libxslt/xsltlocale.c',
-        'libxslt/xsltutils.c'
+        'libxslt/libxslt/attributes.c',
+        'libxslt/libxslt/attrvt.c',
+        'libxslt/libxslt/documents.c',
+        'libxslt/libxslt/extensions.c',
+        'libxslt/libxslt/extra.c',
+        'libxslt/libxslt/functions.c',
+        'libxslt/libxslt/imports.c',
+        'libxslt/libxslt/keys.c',
+        'libxslt/libxslt/namespaces.c',
+        'libxslt/libxslt/numbers.c',
+        'libxslt/libxslt/pattern.c',
+        'libxslt/libxslt/preproc.c',
+        'libxslt/libxslt/preproc.h',
+        'libxslt/libxslt/security.c',
+        'libxslt/libxslt/security.h',
+        'libxslt/libxslt/templates.c',
+        'libxslt/libxslt/transform.c',
+        'libxslt/libxslt/variables.c',
+        'libxslt/libxslt/xslt.c',
+        'libxslt/libxslt/xsltlocale.c',
+        'libxslt/libxslt/xsltutils.c'
       ],
       'link_settings': {
         'libraries': [
@@ -73,16 +73,16 @@
       'target_name': 'libexslt',
       'type': 'static_library',
       'sources': [
-        'libexslt/common.c',
-        'libexslt/crypto.c',
-        'libexslt/date.c',
-        'libexslt/dynamic.c',
-        'libexslt/exslt.c',
-        'libexslt/functions.c',
-        'libexslt/math.c',
-        'libexslt/saxon.c',
-        'libexslt/sets.c',
-        'libexslt/strings.c'
+        'libxslt/libexslt/common.c',
+        'libxslt/libexslt/crypto.c',
+        'libxslt/libexslt/date.c',
+        'libxslt/libexslt/dynamic.c',
+        'libxslt/libexslt/exslt.c',
+        'libxslt/libexslt/functions.c',
+        'libxslt/libexslt/math.c',
+        'libxslt/libexslt/saxon.c',
+        'libxslt/libexslt/sets.c',
+        'libxslt/libexslt/strings.c'
       ],
       'dependencies': [
         'libxslt'
