@@ -27,7 +27,7 @@
   "dependencies": {
     "bindings": "~1.2.1",
     "libxmljs": "^0.11.1",
-    "nan": "~1.2.0"
+    "nan": "~1.7.0"
   },
   "devDependencies": {
     "async": "~0.9.0",

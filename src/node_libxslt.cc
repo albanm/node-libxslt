@@ -1,10 +1,13 @@
+#ifndef BUILDING_NODE_EXTENSION
 #define BUILDING_NODE_EXTENSION
+#endif
 #include <iostream>
 #include <node.h>
 #include <nan.h>
 #include <libxslt/xslt.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#include <libxslt/extensions.h>
 
 // includes from libxmljs
 #include <xml_syntax_error.h>
@@ -12,6 +15,13 @@
 
 #include "./node_libxslt.h"
 #include "./stylesheet.h"
+#include "./extensions.h"
+
+#if 0
+#define DBG(x) std::cerr << x << std::endl
+#else
+#define DBG(x)
+#endif
 
 using namespace v8;
 
@@ -108,23 +118,31 @@ NAN_METHOD(ApplySync) {
 
     char** params = PrepareParams(paramsArray);
 
-    xmlDoc* result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
+    xsltStylesheetPtr style = stylesheet->stylesheet_obj;
+    xmlDocPtr doc = docSource->xml_obj;
+    xsltTransformContextPtr ctxt = xsltNewTransformContext(style, doc);
+    NodeXsltContext **pnctxt = reinterpret_cast<NodeXsltContext**>
+      (xsltGetExtData(ctxt, NodeXsltContext::NAMESPACE));
+    *pnctxt = createContext(false);
+    xmlDoc* result = xsltApplyStylesheetUser(
+      style, doc, (const char **)params, /* output */ NULL, /* profile */ NULL, ctxt);
+    xsltFreeTransformContext(ctxt);
     if (!result) {
         freeArray(params, paramsArray->Length());
         return NanThrowError("Failed to apply stylesheet");
     }
 
     // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
-	// but passing a document by reference and modifying its content works fine
+    // but passing a document by reference and modifying its content works fine
     // replace the empty document in docResult with the result of the stylesheet
-	docResult->xml_obj->_private = NULL;
+    docResult->xml_obj->_private = NULL;
     xmlFreeDoc(docResult->xml_obj);
     docResult->xml_obj = result;
     result->_private = docResult;
 
     freeArray(params, paramsArray->Length());
 
-  	NanReturnUndefined();
+    NanReturnUndefined();
 }
 
 // for memory the segfault i previously fixed were due to xml documents being deleted
@@ -132,7 +150,14 @@ NAN_METHOD(ApplySync) {
 class ApplyWorker : public NanAsyncWorker {
  public:
   ApplyWorker(Stylesheet* stylesheet, libxmljs::XmlDocument* docSource, char** params, int paramsLength, libxmljs::XmlDocument* docResult, NanCallback *callback)
-    : NanAsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), docResult(docResult) {}
+    : NanAsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), docResult(docResult) {
+    xsltStylesheetPtr style = stylesheet->stylesheet_obj;
+    xmlDocPtr doc = docSource->xml_obj;
+    ctxt = xsltNewTransformContext(style, doc);
+    NodeXsltContext **pnctxt = reinterpret_cast<NodeXsltContext**>
+      (xsltGetExtData(ctxt, NodeXsltContext::NAMESPACE));
+    *pnctxt = createContext(true);
+  }
   ~ApplyWorker() {}
 
   // Executed inside the worker-thread.
@@ -140,7 +165,10 @@ class ApplyWorker : public NanAsyncWorker {
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute () {
-    result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
+    xsltStylesheetPtr style = stylesheet->stylesheet_obj;
+    xmlDocPtr doc = docSource->xml_obj;
+    result = xsltApplyStylesheetUser(
+      style, doc, (const char **)params, /* output */ NULL, /* profile */ NULL, ctxt);
   }
 
   // Executed when the async work is complete
@@ -149,6 +177,7 @@ class ApplyWorker : public NanAsyncWorker {
   void HandleOKCallback () {
     NanScope();
 
+    xsltFreeTransformContext(ctxt);
     if (!result) {
         Local<Value> argv[] = { NanError("Failed to apply stylesheet") };
         freeArray(params, paramsLength);
@@ -156,7 +185,7 @@ class ApplyWorker : public NanAsyncWorker {
     } else {
         Local<Value> argv[] = { NanNull() };
 
-        // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
+        // for some obscure reason I didn't manage to create a new libxmljs document,
         // but passing a document by reference and modifying its content works fine
         // replace the empty document in docResult with the result of the stylesheet
         docResult->xml_obj->_private = NULL;
@@ -176,6 +205,7 @@ class ApplyWorker : public NanAsyncWorker {
   char** params;
   int paramsLength;
   libxmljs::XmlDocument* docResult;
+  xsltTransformContextPtr ctxt;
   xmlDoc* result;
 };
 
@@ -199,6 +229,9 @@ NAN_METHOD(RegisterEXSLT) {
     NanReturnUndefined();
 }
 
+NAN_METHOD(RegisterFunction);
+NAN_METHOD(ShutdownOnExit);
+
 // Compose the module by assigning the methods previously prepared
 void InitAll(Handle<Object> exports) {
   	Stylesheet::Init(exports);
@@ -207,5 +240,7 @@ void InitAll(Handle<Object> exports) {
   	exports->Set(NanNew<String>("applySync"), NanNew<FunctionTemplate>(ApplySync)->GetFunction());
     exports->Set(NanNew<String>("applyAsync"), NanNew<FunctionTemplate>(ApplyAsync)->GetFunction());
     exports->Set(NanNew<String>("registerEXSLT"), NanNew<FunctionTemplate>(RegisterEXSLT)->GetFunction());
+    exports->Set(NanNew<String>("registerFunction"), NanNew<FunctionTemplate>(RegisterFunction)->GetFunction());
+    exports->Set(NanNew<String>("shutdownOnExit"), NanNew<FunctionTemplate>(ShutdownOnExit)->GetFunction());
 }
 NODE_MODULE(node_libxslt, InitAll);

@@ -85,6 +85,16 @@ exports.parseFile = function(sourcePath, callback) {
  */
 
 /**
+ * Register an extension function to be used in xpath expressions of a stylesheet
+ * @param {string} name
+ * @param {string} namespace
+ * @param {function} fn
+ */
+exports.registerFunction = binding.registerFunction;
+
+process.on("exit", binding.shutdownOnExit);
+
+/**
  * Apply a stylesheet to a XML document
  *
  * If no callback is given the function will run synchronously and return the result or throw an error.
