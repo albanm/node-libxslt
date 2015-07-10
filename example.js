@@ -1,6 +1,5 @@
 // Mostly to run for debugging purposes
 var fs = require('fs');
-var libxmljs = require("libxmljs");
 var libxslt = require('./index');
 
 var stylesheetSource = fs.readFileSync('./test/resources/cd.xsl', 'utf8');
