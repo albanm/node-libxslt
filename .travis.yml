@@ -3,3 +3,11 @@ node_js:
   - "0.10"
   - "0.11"
   - "0.12"
+  - "iojs"
+env:
+  matrix:
+    - USE_LATEST_NODE_GYP=true
+    - USE_LATEST_NODE_GYP=false
+
+before_install:
+  - if [ $USE_LATEST_NODE_GYP == 'true' ]; then npm explore npm -g -- npm install node-gyp@latest; fi;
