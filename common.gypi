@@ -14,6 +14,7 @@
       }, {
         'xmljs_libraries': [
           '<(node_xmljs)/build/$(BUILDTYPE)/xmljs.node',
+          '<(node_xmljs)/vendor/libxml.conf/include',
           '-Wl,-rpath,<(node_xmljs)/build/$(BUILDTYPE)'
         ],
       }],
