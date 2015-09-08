@@ -10,3 +10,5 @@ env:
 
 before_install:
   - if [ $USE_LATEST_NODE_GYP == 'true' ]; then npm explore npm -g -- npm install node-gyp@latest; fi;
+
+sudo: false
