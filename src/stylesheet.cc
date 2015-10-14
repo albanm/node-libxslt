@@ -29,7 +29,7 @@ void Stylesheet::Init(Handle<Object> exports) {
 // not called from node, private api
 Local<Object> Stylesheet::New(xsltStylesheetPtr stylesheetPtr) {
     Nan::EscapableHandleScope scope;
-    Local<Object> wrapper = Nan::New(constructor).ToLocalChecked()->NewInstance();
+    Local<Object> wrapper = Nan::New(constructor)->NewInstance();
     Stylesheet* stylesheet = new Stylesheet(stylesheetPtr);
     stylesheet->Wrap(wrapper);
     return scope.Escape(wrapper);
