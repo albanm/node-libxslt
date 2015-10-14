@@ -5,7 +5,7 @@
 
 using namespace v8;
 
-Persistent<Function> Stylesheet::constructor;
+Nan::Persistent<Function> Stylesheet::constructor;
 
 Stylesheet::Stylesheet(xsltStylesheetPtr stylesheetPtr) : stylesheet_obj(stylesheetPtr) {}
 
@@ -19,18 +19,18 @@ Stylesheet::~Stylesheet()
 
 void Stylesheet::Init(Handle<Object> exports) {
 	 // Prepare constructor template
-    Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>();
-    tpl->SetClassName(NanNew<String>("Stylesheet"));
+    Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>();
+    tpl->SetClassName(Nan::New<String>("Stylesheet").ToLocalChecked());
   	tpl->InstanceTemplate()->SetInternalFieldCount(1);
   	
-    NanAssignPersistent(constructor, tpl->GetFunction());
+    constructor.Reset(tpl->GetFunction());
 }
 
 // not called from node, private api
 Local<Object> Stylesheet::New(xsltStylesheetPtr stylesheetPtr) {
-    NanEscapableScope();
-    Local<Object> wrapper = NanNew(constructor)->NewInstance();
+    Nan::EscapableHandleScope scope;
+    Local<Object> wrapper = Nan::New(constructor).ToLocalChecked()->NewInstance();
     Stylesheet* stylesheet = new Stylesheet(stylesheetPtr);
     stylesheet->Wrap(wrapper);
-    return NanEscapeScope(wrapper);
+    return scope.Escape(wrapper);
 }
