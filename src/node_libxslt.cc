@@ -75,7 +75,9 @@ NAN_METHOD(StylesheetAsync) {
     Nan::HandleScope scope;
     libxmljs::XmlDocument* doc = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[0]->ToObject());
     Nan::Callback *callback = new Nan::Callback(info[1].As<Function>());
-    Nan::AsyncQueueWorker(new StylesheetWorker(doc, callback));
+    StylesheetWorker* worker = new StylesheetWorker(doc, callback);
+    worker->SaveToPersistent("doc", info[0]);
+    Nan::AsyncQueueWorker(worker);
     return;
 }
 
@@ -194,7 +196,9 @@ NAN_METHOD(ApplyAsync) {
 
     char** params = PrepareParams(paramsArray);
 
-    Nan::AsyncQueueWorker(new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), docResult, callback));
+    ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), docResult, callback);
+    for (uint32_t i = 0; i < 4; ++i) worker->SaveToPersistent(i, info[i]);
+    Nan::AsyncQueueWorker(worker);
     return;
 }
 
