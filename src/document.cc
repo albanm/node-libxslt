@@ -5,7 +5,7 @@
 
 using namespace v8;
 
-Nan::Persistent<Function> Document::constructor;
+Persistent<Function> Document::constructor;
 
 Document::Document(xmlDocumentPtr documentPtr) : document_obj(documentPtr) {}
 
@@ -20,14 +20,14 @@ void Document::Init(Handle<Object> exports) {
   	tpl->SetClassName(String::NewSymbol("Document"));
   	tpl->InstanceTemplate()->SetInternalFieldCount(1);
   	
-  	constructor = Nan::Persistent<Function>::New(tpl->GetFunction());
+  	constructor = Persistent<Function>::New(tpl->GetFunction());
 }
 
 // not called from node, private api
 Local<Object> Document::New(xmlDocumentPtr documentPtr) {
-    Nan::EscapableHandleScope scope;
-    Local<Object> wrapper = Nan::New(constructor).ToLocalChecked()->NewInstance();
+    NanEscapableScope();
+    Local<Object> wrapper = NanNew(constructor)->NewInstance();
     Document* Document = new Document(documentPtr);
     Document->Wrap(wrapper);
-    return scope.Escape(wrapper);
+    return NanEscapeScope(wrapper);
 }

@@ -48,7 +48,7 @@ exports.parse = function(source, callback) {
 			throw err;
 		}
 	}
-	
+
 	if (callback) {
 		binding.stylesheetAsync(source, function(err, stylesheet){
 			if (err) return callback(err);
@@ -83,6 +83,48 @@ exports.parseFile = function(sourcePath, callback) {
  * @param {error} [err]
  * @param {Stylesheet} [stylesheet]
  */
+
+/**
+ * Apply a stylesheet to a XML document
+ *
+ * this is only the async version
+ *
+ * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
+ * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
+ */
+Stylesheet.prototype.applyToString=function(source, params,callback) {
+	if (typeof params === 'function') {
+		callback = params;
+		params = {};
+	}
+	params = params || {};
+
+	for(var p in params) {
+		// string parameters must be surrounded by quotes to be usable by the stylesheet
+		if (typeof params[p] === 'string') params[p] = '\'' + params[p] + '\'';
+	}
+
+	// flatten the params object in an array
+	var paramsArray = [];
+	for(var key in params) {
+		paramsArray.push(key);
+		paramsArray.push(params[key]);
+	}
+
+	if (callback) {
+			binding.applyAsyncToString(this.stylesheetObj, source, paramsArray, function(err,res){
+				if (err) return callback(err);
+				callback(null, res);
+		});
+	} else {
+		var res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
+		return res;
+	}
+
+
+	res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
+	return res;
+}
 
 /**
  * Apply a stylesheet to a XML document
@@ -136,7 +178,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 			callback(null, outputString ? result.toString() : result);
 		});
 	} else {
-		binding.applySync(this.stylesheetObj, source, paramsArray, result);	
+		var r=binding.applySyncToString(this.stylesheetObj, source, paramsArray);//, result);
 		return outputString ? result.toString() : result;
 	}
 };

@@ -8,7 +8,7 @@
 #include <libxslt/xsltutils.h>
 #include <libexslt/exslt.h>
 
-class Stylesheet : public Nan::ObjectWrap {
+class Stylesheet : public node::ObjectWrap {
 	public:
 	    static void Init(v8::Handle<v8::Object> exports);
 	    static v8::Local<v8::Object> New(xsltStylesheetPtr stylesheetPtr);
@@ -18,7 +18,7 @@ class Stylesheet : public Nan::ObjectWrap {
 	private:
 	    explicit Stylesheet(xsltStylesheetPtr stylesheetPtr);
 	    ~Stylesheet();
-	    static Nan::Persistent<v8::Function> constructor;
+	    static v8::Persistent<v8::Function> constructor;
 };
 
 #endif  // SRC_STYLESHEET_H_

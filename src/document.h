@@ -8,7 +8,7 @@
 #include <libxslt/xsltutils.h>
 #include <libexslt/exslt.h>
 
-class Document : public Nan::ObjectWrap {
+class Document : public node::ObjectWrap {
 	public:
 	    static void Init(v8::Handle<v8::Object> exports);
 	    static v8::Local<v8::Object> New(xmlDocumentPtr DocumentPtr);
@@ -18,7 +18,7 @@ class Document : public Nan::ObjectWrap {
 	private:
 	    explicit Document(xmlDocumentPtr DocumentPtr);
 	    ~Document();
-	    static Nan::Persistent<v8::Function> constructor;
+	    static v8::Persistent<v8::Function> constructor;
 };
 
 #endif  // SRC_DOCUMENT_H_
