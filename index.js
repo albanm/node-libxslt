@@ -149,6 +149,15 @@ Stylesheet.prototype.apply = function(source, params, callback) {
  * @return {string} - with the resulting transformation
  */
 Stylesheet.prototype.applyToString=function(source, params,callback) {
+	if (typeof source === 'string') {
+		try {
+			source = libxmljs.parseXml(source, { nocdata: true });
+		} catch (err) {
+			if (callback) return callback(err);
+			throw err;
+		}
+	}
+
 	if (typeof params === 'function') {
 		callback = params;
 		params = {};

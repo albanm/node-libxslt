@@ -164,6 +164,16 @@ describe('node-libxslt', function() {
 		});
 	});
 
+	describe('omit-xml-declaration directive', function() {
+		it('should respect omit-xml-declaration directive', function() {
+			var stylesheetStr = fs.readFileSync('test/resources/omit-xml-declaration.xsl', 'utf8');
+			var stylesheetEsc = libxslt.parse(stylesheetStr);
+			var result = stylesheetEsc.applyToString('<root/>');
+			result.should.be.type('string');
+			result.should.not.match(/\?xml/)
+		});
+	});
+
 	describe('libexslt bindings', function(){
 		it('should expose EXSLT functions', function(callback){
 			libxslt.parseFile('test/resources/min-value.xsl', function(err, stylesheet){
