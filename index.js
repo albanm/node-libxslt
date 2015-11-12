@@ -87,48 +87,6 @@ exports.parseFile = function(sourcePath, callback) {
 /**
  * Apply a stylesheet to a XML document
  *
- * this is only the async version
- *
- * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
- * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
- */
-Stylesheet.prototype.applyToString=function(source, params,callback) {
-	if (typeof params === 'function') {
-		callback = params;
-		params = {};
-	}
-	params = params || {};
-
-	for(var p in params) {
-		// string parameters must be surrounded by quotes to be usable by the stylesheet
-		if (typeof params[p] === 'string') params[p] = '\'' + params[p] + '\'';
-	}
-
-	// flatten the params object in an array
-	var paramsArray = [];
-	for(var key in params) {
-		paramsArray.push(key);
-		paramsArray.push(params[key]);
-	}
-
-	if (callback) {
-			binding.applyAsyncToString(this.stylesheetObj, source, paramsArray, function(err,res){
-				if (err) return callback(err);
-				callback(null, res);
-		});
-	} else {
-		var res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
-		return res;
-	}
-
-
-	res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
-	return res;
-}
-
-/**
- * Apply a stylesheet to a XML document
- *
  * If no callback is given the function will run synchronously and return the result or throw an error.
  *
  * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
@@ -178,10 +136,52 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 			callback(null, outputString ? result.toString() : result);
 		});
 	} else {
-		var r=binding.applySyncToString(this.stylesheetObj, source, paramsArray);//, result);
+		binding.applySync(this.stylesheetObj, source, paramsArray, result);
 		return outputString ? result.toString() : result;
 	}
 };
+
+/**
+ * Apply a stylesheet to a XML document and return result string
+ * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
+ * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
+ * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response. Expects err and a string
+ * @return {string} - with the resulting transformation
+ */
+Stylesheet.prototype.applyToString=function(source, params,callback) {
+	if (typeof params === 'function') {
+		callback = params;
+		params = {};
+	}
+	params = params || {};
+
+	for(var p in params) {
+		// string parameters must be surrounded by quotes to be usable by the stylesheet
+		if (typeof params[p] === 'string') params[p] = '\'' + params[p] + '\'';
+	}
+
+	// flatten the params object in an array
+	var paramsArray = [];
+	for(var key in params) {
+		paramsArray.push(key);
+		paramsArray.push(params[key]);
+	}
+
+	if (callback) {
+			binding.applyAsyncToString(this.stylesheetObj, source, paramsArray, function(err,res){
+				if (err) return callback(err);
+				callback(null, res);
+		});
+	} else {
+		var res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
+		return res;
+	}
+
+
+	res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
+	return res;
+}
+
 /**
  * Callback to the Stylesheet.apply function
  * @callback Stylesheet~applyCallback
