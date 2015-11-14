@@ -166,11 +166,23 @@ describe('node-libxslt', function() {
 
 	describe('omit-xml-declaration directive', function() {
 		it('should respect omit-xml-declaration directive', function() {
-			var stylesheetStr = fs.readFileSync('test/resources/omit-xml-declaration.xsl', 'utf8');
-			var stylesheetEsc = libxslt.parse(stylesheetStr);
-			var result = stylesheetEsc.applyToString('<root/>');
-			result.should.be.type('string');
-			result.should.not.match(/\?xml/)
+			var data='<root><!-- comment on xml data --></root>';
+			var stylesheetTextOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-text-out.xsl', 'utf8'));
+			var text = stylesheetTextOut.applyToString(data);
+			text.should.be.type('string');
+			text.should.not.match(/\?xml/)
+			text.should.match(/<foo\/>/);
+			text.should.match(/<bar\/>/);
+			text.should.not.match(/\<!-- comment/);
+			text.should.not.match(/\<node\/>/);
+			var stylesheetXMLOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-xml-out.xsl', 'utf8'));
+			var xml = stylesheetXMLOut.applyToString(data);
+			xml.should.be.type('string');
+			xml.should.not.match(/\?xml/)
+			xml.should.match(/<foo\/>/);
+			xml.should.match(/&lt;bar\/&gt;/);
+			xml.should.not.match(/\<!-- comment/);
+			xml.should.match(/\<node\/>/);
 		});
 	});
 
