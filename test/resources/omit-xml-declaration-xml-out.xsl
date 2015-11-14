@@ -3,6 +3,7 @@
   <xsl:template match="root">
     <xsl:text disable-output-escaping="yes"><![CDATA[<foo/>]]></xsl:text>
     <xsl:text disable-output-escaping="no"><![CDATA[<bar/>]]></xsl:text>
-    <node/><!-- comment -->
+    <node/>
+    <!-- comment on xslt -->
   </xsl:template>
 </xsl:stylesheet>
