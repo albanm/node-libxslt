@@ -170,7 +170,7 @@ describe('node-libxslt', function() {
 			var stylesheetTextOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-text-out.xsl', 'utf8'));
 			var result = stylesheetTextOut.applyToString(data);
 			result.should.be.type('string');
-			result.should.not.match(/\?xml/)
+			result.should.not.match(/\?xml/);
 			result.should.match(/<foo\/>/);
 			result.should.match(/<bar\/>/);
 			result.should.not.match(/\<!-- comment/);
@@ -181,7 +181,7 @@ describe('node-libxslt', function() {
 			var stylesheetXMLOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-xml-out.xsl', 'utf8'));
 			var result = stylesheetXMLOut.applyToString(data);
 			result.should.be.type('string');
-			result.should.not.match(/\?xml/)
+			result.should.not.match(/\?xml/);
 			result.should.match(/<foo\/>/);
 			result.should.match(/&lt;bar\/&gt;/);
 			result.should.not.match(/\<!-- comment/);
