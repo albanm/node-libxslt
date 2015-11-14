@@ -174,7 +174,8 @@ describe('node-libxslt', function() {
 			result.should.match(/<foo\/>/);
 			result.should.match(/<bar\/>/);
 			result.should.not.match(/\<!-- comment/);
-			result.should.not.match(/\<node\/>/);
+			result.should.not.match(/\<node/);
+			result.should.match(/with text/);
 	});
 	it('should be respected by a stylesheet with output method xml', function() {
 			var data='<root><!-- comment on xml data --></root>';
@@ -185,7 +186,8 @@ describe('node-libxslt', function() {
 			result.should.match(/<foo\/>/);
 			result.should.match(/&lt;bar\/&gt;/);
 			result.should.not.match(/\<!-- comment/);
-			result.should.match(/\<node\/>/);
+			result.should.match(/\<node/);
+			result.should.match(/with text/);
 		});
 	});
 
