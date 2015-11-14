@@ -146,7 +146,7 @@ Stylesheet.prototype.apply = function(source, params, callback) {
  * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
  * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
  * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response. Expects err and a string
- * @return {string} - with the resulting transformation
+ * @return {string} - with the resulting transformation on sync mode
  */
 Stylesheet.prototype.applyToString=function(source, params,callback) {
 	if (typeof source === 'string') {
