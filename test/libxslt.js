@@ -164,6 +164,33 @@ describe('node-libxslt', function() {
 		});
 	});
 
+	describe('omit-xml-declaration directive', function() {
+		it('should be respected by a stylesheet with output method text', function() {
+			var data='<root><!-- comment on xml data --></root>';
+			var stylesheetTextOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-text-out.xsl', 'utf8'));
+			var result = stylesheetTextOut.applyToString(data);
+			result.should.be.type('string');
+			result.should.not.match(/\?xml/);
+			result.should.match(/<foo\/>/);
+			result.should.match(/<bar\/>/);
+			result.should.not.match(/\<!-- comment/);
+			result.should.not.match(/\<node/);
+			result.should.match(/with text/);
+	});
+	it('should be respected by a stylesheet with output method xml', function() {
+			var data='<root><!-- comment on xml data --></root>';
+			var stylesheetXMLOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-xml-out.xsl', 'utf8'));
+			var result = stylesheetXMLOut.applyToString(data);
+			result.should.be.type('string');
+			result.should.not.match(/\?xml/);
+			result.should.match(/<foo\/>/);
+			result.should.match(/&lt;bar\/&gt;/);
+			result.should.not.match(/\<!-- comment/);
+			result.should.match(/\<node/);
+			result.should.match(/with text/);
+		});
+	});
+
 	describe('libexslt bindings', function(){
 		it('should expose EXSLT functions', function(callback){
 			libxslt.parseFile('test/resources/min-value.xsl', function(err, stylesheet){

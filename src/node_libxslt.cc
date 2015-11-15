@@ -24,7 +24,7 @@ NAN_METHOD(StylesheetSync) {
     //libxmljs::XmlDocument* doc = libxmljs::XmlDocument::FromXml(info);
 
     xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc->xml_obj);
-    // TODO fetch actual error. 
+    // TODO fetch actual error.
     if (!stylesheet) {
         return Nan::ThrowError("Could not parse XML string as XSLT stylesheet");
     }
@@ -94,7 +94,7 @@ char** PrepareParams(Handle<Array> array) {
     uint32_t arrayLen = array->Length();
     char** params = (char **)malloc(sizeof(char *) * (arrayLen + 1));
     memset(params, 0, sizeof(char *) * (array->Length() + 1));
-    for (int i = 0; i < array->Length(); i++) {
+    for (unsigned int i = 0; i < array->Length(); i++) {
         Local<String> param = array->Get(Nan::New<Integer>(i))->ToString();
         params[i] = (char *)malloc(sizeof(char) * (param->Utf8Length() + 1));
         param->WriteUtf8(params[i]);
@@ -135,6 +135,9 @@ NAN_METHOD(ApplySync) {
 // by garbage collector before their associated stylesheet.
 class ApplyWorker : public Nan::AsyncWorker {
  public:
+   // apply to String constructor
+  ApplyWorker(Stylesheet* stylesheet, libxmljs::XmlDocument* docSource, char** params, int paramsLength, Nan::Callback *callback)
+    : Nan::AsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), docResult(NULL) {}
   ApplyWorker(Stylesheet* stylesheet, libxmljs::XmlDocument* docSource, char** params, int paramsLength, libxmljs::XmlDocument* docResult, Nan::Callback *callback)
     : Nan::AsyncWorker(callback), stylesheet(stylesheet), docSource(docSource), params(params), paramsLength(paramsLength), docResult(docResult) {}
   ~ApplyWorker() {}
@@ -158,7 +161,7 @@ class ApplyWorker : public Nan::AsyncWorker {
         Local<Value> argv[] = { Nan::Error("Failed to apply stylesheet") };
         freeArray(params, paramsLength);
         callback->Call(2, argv);
-    } else {
+    } else if (docResult) {
         Local<Value> argv[] = { Nan::Null() };
 
         // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
@@ -170,8 +173,21 @@ class ApplyWorker : public Nan::AsyncWorker {
         result->_private = docResult;
 
         freeArray(params, paramsLength);
-    
+
         callback->Call(1, argv);
+    } else {// apply assync to string
+        unsigned char* resStr;
+        int len;
+        int cnt=xsltSaveResultToString(&resStr,&len,result,stylesheet->stylesheet_obj);
+        freeArray(params, paramsLength);
+        xmlFreeDoc(result);
+        if (cnt==-1) {
+            Local<Value> argv[] = { Nan::Error("Failed to apply stylesheet") };
+            callback->Call(2, argv);
+        } else {
+          Local<Value> argv[] = { Nan::Null(),Nan::New<String>((char*)resStr).ToLocalChecked()};
+          callback->Call(2, argv);
+        }
     }
   };
 
@@ -202,6 +218,40 @@ NAN_METHOD(ApplyAsync) {
     return;
 }
 
+// process target doc and return raw string (in case the result is not a xml derivate)
+// this is the way to choose if omit-xml-declaration is to be respected
+NAN_METHOD(ApplySyncToString) {
+    Nan::HandleScope scope;
+
+    Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(info[0]->ToObject());
+    libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[1]->ToObject());
+    Handle<Array> paramsArray = Handle<Array>::Cast(info[2]);
+
+    char** params = PrepareParams(paramsArray);
+    unsigned char* resStr;
+    int len;
+    xmlDocPtr res = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
+    int cnt=xsltSaveResultToString(&resStr,&len,res,stylesheet->stylesheet_obj);
+    xmlFreeDoc(res);
+    freeArray(params, paramsArray->Length());
+    if (cnt==-1) return Nan::ThrowError("Failed to apply stylesheet");
+    else  info.GetReturnValue().Set(Nan::New<String>((char*)resStr).ToLocalChecked());
+}
+
+NAN_METHOD(ApplyAsyncToString) {
+  Nan::HandleScope scope;
+
+  Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(info[0]->ToObject());
+  libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[1]->ToObject());
+  Handle<Array> paramsArray = Handle<Array>::Cast(info[2]);
+  Nan::Callback *callback = new Nan::Callback(info[3].As<Function>());
+
+    char** params = PrepareParams(paramsArray);
+
+    Nan::AsyncQueueWorker(new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), callback));
+    return;
+}
+
 NAN_METHOD(RegisterEXSLT) {
     exsltRegisterAll();
     return;
@@ -214,6 +264,8 @@ void InitAll(Handle<Object> exports) {
     exports->Set(Nan::New<String>("stylesheetAsync").ToLocalChecked(), Nan::New<FunctionTemplate>(StylesheetAsync)->GetFunction());
   	exports->Set(Nan::New<String>("applySync").ToLocalChecked(), Nan::New<FunctionTemplate>(ApplySync)->GetFunction());
     exports->Set(Nan::New<String>("applyAsync").ToLocalChecked(), Nan::New<FunctionTemplate>(ApplyAsync)->GetFunction());
+    exports->Set(Nan::New<String>("applySyncToString").ToLocalChecked(), Nan::New<FunctionTemplate>(ApplySyncToString)->GetFunction());
+    exports->Set(Nan::New<String>("applyAsyncToString").ToLocalChecked(), Nan::New<FunctionTemplate>(ApplyAsyncToString)->GetFunction());
     exports->Set(Nan::New<String>("registerEXSLT").ToLocalChecked(), Nan::New<FunctionTemplate>(RegisterEXSLT)->GetFunction());
 }
 NODE_MODULE(node_libxslt, InitAll);
