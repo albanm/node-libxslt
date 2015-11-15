@@ -15,14 +15,26 @@
 
 using namespace v8;
 
+// Assume ownership of the input document at the libxml level.
+// The libxmljs object will be modified so it now represents an empty document.
+static xmlDoc* stealDocument(Local<Value> input) {
+    libxmljs::XmlDocument* docWrapper =
+        Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(input->ToObject());
+    xmlDoc* stylesheetDoc = docWrapper->xml_obj;
+    xmlDoc* dummyDoc = xmlNewDoc((const xmlChar*)"1.0");
+    stylesheetDoc->_private = NULL;
+    dummyDoc->_private = docWrapper;
+    docWrapper->xml_obj = dummyDoc;
+    return stylesheetDoc;
+}
+
 NAN_METHOD(StylesheetSync) {
-  	Nan::HandleScope scope;
-
-    libxmljs::XmlDocument* doc = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[0]->ToObject());
-
-    xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc->xml_obj);
+    Nan::HandleScope scope;
+    xmlDoc* doc = stealDocument(info[0]);
+    xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc);
     // TODO fetch actual error.
     if (!stylesheet) {
+        xmlFreeDoc(doc);
         return Nan::ThrowError("Could not parse XML string as XSLT stylesheet");
     }
 
@@ -34,7 +46,7 @@ NAN_METHOD(StylesheetSync) {
 // by garbage collector before their associated stylesheet.
 class StylesheetWorker : public Nan::AsyncWorker {
  public:
-  StylesheetWorker(libxmljs::XmlDocument* doc, Nan::Callback *callback)
+  StylesheetWorker(xmlDoc* doc, Nan::Callback *callback)
     : Nan::AsyncWorker(callback), doc(doc) {}
   ~StylesheetWorker() {}
 
@@ -44,7 +56,7 @@ class StylesheetWorker : public Nan::AsyncWorker {
   // should go on `this`.
   void Execute () {
     libxmljs::WorkerSentinel workerSentinel(workerParent);
-    result = xsltParseStylesheetDoc(doc->xml_obj);
+    result = xsltParseStylesheetDoc(doc);
   }
 
   // Executed when the async work is complete
@@ -53,6 +65,7 @@ class StylesheetWorker : public Nan::AsyncWorker {
   void HandleOKCallback () {
     Nan::HandleScope scope;
     if (!result) {
+        xmlFreeDoc(doc);
         Local<Value> argv[] = { Nan::Error("Failed to parse stylesheet") };
         callback->Call(1, argv);
     } else {
@@ -64,16 +77,15 @@ class StylesheetWorker : public Nan::AsyncWorker {
 
  private:
   libxmljs::WorkerParent workerParent;
-  libxmljs::XmlDocument* doc;
+  xmlDoc* doc;
   xsltStylesheetPtr result;
 };
 
 NAN_METHOD(StylesheetAsync) {
     Nan::HandleScope scope;
-    libxmljs::XmlDocument* doc = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[0]->ToObject());
+    xmlDoc* doc = stealDocument(info[0]);
     Nan::Callback *callback = new Nan::Callback(info[1].As<Function>());
     StylesheetWorker* worker = new StylesheetWorker(doc, callback);
-    worker->SaveToPersistent("doc", info[0]);
     Nan::AsyncQueueWorker(worker);
     return;
 }
