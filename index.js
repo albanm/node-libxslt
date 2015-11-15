@@ -126,70 +126,18 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 		paramsArray.push(params[key]);
 	}
 
-	// for some obscure reason I didn't manage to create a new libxmljs document in applySync,
-	// but passing a document by reference and modifying its content works fine
-	var result = new libxmljs.Document();
+	var docResult = new libxmljs.Document();
 
 	if (callback) {
-		binding.applyAsync(this.stylesheetObj, source, paramsArray, result, function(err){
+		binding.applyAsync(this.stylesheetObj, source, paramsArray, outputString, docResult, function(err, strResult){
 			if (err) return callback(err);
-			callback(null, outputString ? result.toString() : result);
+			callback(null, outputString ? strResult : docResult);
 		});
 	} else {
-		binding.applySync(this.stylesheetObj, source, paramsArray, result);
-		return outputString ? result.toString() : result;
+		var strResult = binding.applySync(this.stylesheetObj, source, paramsArray, outputString, docResult);
+		return outputString ? strResult : docResult;
 	}
 };
-
-/**
- * Apply a stylesheet to a XML document and return result string
- * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
- * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
- * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response. Expects err and a string
- * @return {string} - with the resulting transformation on sync mode
- */
-Stylesheet.prototype.applyToString=function(source, params,callback) {
-	if (typeof source === 'string') {
-		try {
-			source = libxmljs.parseXml(source, { nocdata: true });
-		} catch (err) {
-			if (callback) return callback(err);
-			throw err;
-		}
-	}
-
-	if (typeof params === 'function') {
-		callback = params;
-		params = {};
-	}
-	params = params || {};
-
-	for(var p in params) {
-		// string parameters must be surrounded by quotes to be usable by the stylesheet
-		if (typeof params[p] === 'string') params[p] = '\'' + params[p] + '\'';
-	}
-
-	// flatten the params object in an array
-	var paramsArray = [];
-	for(var key in params) {
-		paramsArray.push(key);
-		paramsArray.push(params[key]);
-	}
-
-	if (callback) {
-			binding.applyAsyncToString(this.stylesheetObj, source, paramsArray, function(err,res){
-				if (err) return callback(err);
-				callback(null, res);
-		});
-	} else {
-		var res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
-		return res;
-	}
-
-
-	res=binding.applySyncToString(this.stylesheetObj, source, paramsArray);
-	return res;
-}
 
 /**
  * Callback to the Stylesheet.apply function

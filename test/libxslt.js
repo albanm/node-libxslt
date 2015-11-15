@@ -117,13 +117,6 @@ describe('node-libxslt', function() {
 			result.should.be.type('string');
 			result.should.match(/<p>My param: MyParamValue<\/p>/);
 		});
-		it('should apply a stylesheet with a include to a xml string', function(callback) {
-			stylesheetInclude.apply(doc2Source, function(err, result) {
-				result.should.be.type('string');
-				result.should.match(/Title - Lover Birds/);
-				callback();
-			});
-		});
 	});
 
 	describe('asynchronous apply function', function() {
@@ -139,6 +132,13 @@ describe('node-libxslt', function() {
 			stylesheet.apply(docSource, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
+				callback();
+			});
+		});
+		it('should apply a stylesheet with a include to a xml string', function(callback) {
+			stylesheetInclude.apply(doc2Source, function(err, result) {
+				result.should.be.type('string');
+				result.should.match(/Title - Lover Birds/);
 				callback();
 			});
 		});
@@ -168,7 +168,7 @@ describe('node-libxslt', function() {
 		it('should be respected by a stylesheet with output method text', function() {
 			var data='<root><!-- comment on xml data --></root>';
 			var stylesheetTextOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-text-out.xsl', 'utf8'));
-			var result = stylesheetTextOut.applyToString(data);
+			var result = stylesheetTextOut.apply(data);
 			result.should.be.type('string');
 			result.should.not.match(/\?xml/);
 			result.should.match(/<foo\/>/);
@@ -177,10 +177,11 @@ describe('node-libxslt', function() {
 			result.should.not.match(/\<node/);
 			result.should.match(/with text/);
 	});
+
 	it('should be respected by a stylesheet with output method xml', function() {
 			var data='<root><!-- comment on xml data --></root>';
 			var stylesheetXMLOut = libxslt.parse(fs.readFileSync('test/resources/omit-xml-declaration-xml-out.xsl', 'utf8'));
-			var result = stylesheetXMLOut.applyToString(data);
+			var result = stylesheetXMLOut.apply(data);
 			result.should.be.type('string');
 			result.should.not.match(/\?xml/);
 			result.should.match(/<foo\/>/);
