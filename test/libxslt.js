@@ -105,6 +105,12 @@ describe('node-libxslt', function() {
 			result.should.be.type('object');
 			result.toString().should.match(/<td>Bob Dylan<\/td>/);
 		});
+		it('should apply a stylesheet to a libxslt.libxmljs xml document and force output as string', function() {
+			var doc = libxslt.libxmljs.parseXml(docSource);
+			var result = stylesheet.apply(doc, {}, {outputString: true});
+			result.should.be.type('string');
+			result.should.match(/<td>Bob Dylan<\/td>/);
+		});
 		it('should apply a stylesheet to a xml string', function() {
 			var result = stylesheet.apply(docSource);
 			result.should.be.type('string');
@@ -125,6 +131,14 @@ describe('node-libxslt', function() {
 			stylesheet.apply(doc, function(err, result) {
 				result.should.be.type('object');
 				result.toString().should.match(/<td>Bob Dylan<\/td>/);
+				callback();
+			});
+		});
+		it('should apply a stylesheet to a libxslt.libxmljs xml document and force output as string', function(callback) {
+			var doc = libxslt.libxmljs.parseXml(docSource);
+			stylesheet.apply(doc, {}, {outputString: true}, function(err, result) {
+				result.should.be.type('string');
+				result.should.match(/<td>Bob Dylan<\/td>/);
 				callback();
 			});
 		});

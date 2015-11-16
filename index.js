@@ -91,16 +91,23 @@ exports.parseFile = function(sourcePath, callback) {
  *
  * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
  * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
+ * @param {object} [options] - Additional parameters. For now only boolean 'outputString' is supported to force the type of the output.
  * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.
  * @return {string|Document} Only if no callback is given. Type is the same as the source param.
  */
-Stylesheet.prototype.apply = function(source, params, callback) {
-	// params are optional
+Stylesheet.prototype.apply = function(source, params, options, callback) {
+	// params and options parameters are optional
+	if (typeof options === 'function') {
+		callback = options;
+		options = {};
+	}
 	if (typeof params === 'function') {
 		callback = params;
 		params = {};
+		options = {};
 	}
 	params = params || {};
+	options = options || {};
 
 	for(var p in params) {
 		// string parameters must be surrounded by quotes to be usable by the stylesheet
@@ -108,15 +115,18 @@ Stylesheet.prototype.apply = function(source, params, callback) {
 	}
 
 	// xml can be given as a string or a pre-parsed xml document
-	var outputString = false;
-	if (typeof source === 'string') {
-		try {
-			source = libxmljs.parseXml(source);
-		} catch (err) {
-			if (callback) return callback(err);
-			throw err;
+	var outputString = options.outputString;
+	if (outputString === undefined) {
+		outputString = false;
+		if (typeof source === 'string') {
+			try {
+				source = libxmljs.parseXml(source);
+			} catch (err) {
+				if (callback) return callback(err);
+				throw err;
+			}
+			outputString = true;
 		}
-		outputString = true;
 	}
 
 	// flatten the params object in an array
