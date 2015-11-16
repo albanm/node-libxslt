@@ -116,11 +116,11 @@ extern "C" {
  * Whether module support is configured into libxslt
  * Note: no default module path for win32 platforms
  */
-#if 0
+#if 1
 #ifndef WITH_MODULES
 #define WITH_MODULES
 #endif
-#define LIBXSLT_DEFAULT_PLUGINS_PATH() "/usr/local/lib/libxslt-plugins"
+#define LIBXSLT_DEFAULT_PLUGINS_PATH() NULL
 #endif
 
 /**
