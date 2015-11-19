@@ -107,7 +107,7 @@ describe('node-libxslt', function() {
 		});
 		it('should apply a stylesheet to a libxslt.libxmljs xml document and force output as string', function() {
 			var doc = libxslt.libxmljs.parseXml(docSource);
-			var result = stylesheet.apply(doc, {}, {outputString: true});
+			var result = stylesheet.apply(doc, {}, {outputFormat: 'string'});
 			result.should.be.type('string');
 			result.should.match(/<td>Bob Dylan<\/td>/);
 		});
@@ -115,6 +115,11 @@ describe('node-libxslt', function() {
 			var result = stylesheet.apply(docSource);
 			result.should.be.type('string');
 			result.should.match(/<td>Bob Dylan<\/td>/);
+		});
+		it('should apply a stylesheet to a xml string and force output as document', function() {
+			var result = stylesheet.apply(docSource, {}, {outputFormat: 'document'});
+			result.should.be.type('object');
+			result.toString().should.match(/<td>Bob Dylan<\/td>/);
 		});
 		it('should apply a stylesheet with a parameter', function() {
 			var result = stylesheet.apply(docSource, {
@@ -136,7 +141,7 @@ describe('node-libxslt', function() {
 		});
 		it('should apply a stylesheet to a libxslt.libxmljs xml document and force output as string', function(callback) {
 			var doc = libxslt.libxmljs.parseXml(docSource);
-			stylesheet.apply(doc, {}, {outputString: true}, function(err, result) {
+			stylesheet.apply(doc, {}, {outputFormat: 'string'}, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
 				callback();
@@ -146,6 +151,13 @@ describe('node-libxslt', function() {
 			stylesheet.apply(docSource, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
+				callback();
+			});
+		});
+		it('should apply a stylesheet to a xml string and force output as document', function(callback) {
+			stylesheet.apply(docSource, {}, {outputFormat: 'document'}, function(err, result) {
+				result.should.be.type('object');
+				result.toString().should.match(/<td>Bob Dylan<\/td>/);
 				callback();
 			});
 		});
