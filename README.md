@@ -49,7 +49,7 @@ var stylesheet = libxslt.parse(stylesheetObj);
 
 var document = libxmljs.parseXml(documentString);
 stylesheet.apply(document, function(err, result){
-	// result is now a libxmljs document containing the result of the transformation
+  // result is now a libxmljs document containing the result of the transformation
 });
 
 ```
@@ -127,12 +127,17 @@ Node.js bindings for libxslt compatible with libxmljs
 **Members**
 
 * [libxslt](#module_libxslt)
+  * [libxslt.libxmljs](#module_libxslt.libxmljs)
   * [libxslt.parse(source, [callback])](#module_libxslt.parse)
   * [libxslt.parseFile(sourcePath, callback)](#module_libxslt.parseFile)
   * [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
     * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
-    * [stylesheet.apply(source, [params], [callback])](#module_libxslt..Stylesheet#apply)
-    * [stylesheet.applyToFile(sourcePath, [params], callback)](#module_libxslt..Stylesheet#applyToFile)
+    * [stylesheet.apply(source, [params], [options], [callback])](#module_libxslt..Stylesheet#apply)
+    * [stylesheet.applyToFile(sourcePath, [params], [options], callback)](#module_libxslt..Stylesheet#applyToFile)
+
+<a name="module_libxslt.libxmljs"></a>
+##libxslt.libxmljs
+The libxmljs module. Prevents the need for a user's code to require it a second time. Also prevent weird bugs.
 
 <a name="module_libxslt.parse"></a>
 ##libxslt.parse(source, [callback])
@@ -161,8 +166,8 @@ Parse a XSL stylesheet
 
 * [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
   * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
-  * [stylesheet.apply(source, [params], [callback])](#module_libxslt..Stylesheet#apply)
-  * [stylesheet.applyToFile(sourcePath, [params], callback)](#module_libxslt..Stylesheet#applyToFile)
+  * [stylesheet.apply(source, [params], [options], [callback])](#module_libxslt..Stylesheet#apply)
+  * [stylesheet.applyToFile(sourcePath, [params], [options], callback)](#module_libxslt..Stylesheet#applyToFile)
 
 <a name="new_module_libxslt..Stylesheet"></a>
 ###new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)
@@ -178,7 +183,7 @@ if we don't store the stylesheet doc it will be deleted by garbage collector and
 
 **Scope**: inner class of [libxslt](#module_libxslt)  
 <a name="module_libxslt..Stylesheet#apply"></a>
-###stylesheet.apply(source, [params], [callback])
+###stylesheet.apply(source, [params], [options], [callback])
 Apply a stylesheet to a XML document
 
 If no callback is given the function will run synchronously and return the result or throw an error.
@@ -187,18 +192,19 @@ If no callback is given the function will run synchronously and return the resul
 
 - source `string` | `Document` - The XML content to apply the stylesheet to given as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
 - \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
+- \[options\] `object` - Additional parameters. For now only string 'outputFormat' is supported to force the type of the output, values are 'document' or 'string'.  
 - \[callback\] <code>[applyCallback](#Stylesheet..applyCallback)</code> - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.  
 
 **Returns**: `string` | `Document` - Only if no callback is given. Type is the same as the source param.  
 <a name="module_libxslt..Stylesheet#applyToFile"></a>
-###stylesheet.applyToFile(sourcePath, [params], callback)
+###stylesheet.applyToFile(sourcePath, [params], [options], callback)
 Apply a stylesheet to a XML file
 
 **Params**
 
 - sourcePath `string` - The path of the file to read  
 - \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
+- \[options\] `object` - Additional parameters. For now only string 'outputFormat' is supported to force the type of the output, values are 'document' or 'string'.  
 - callback <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response. Expects err and result as string.  
 
 *documented by [jsdoc-to-markdown](https://github.com/75lb/jsdoc-to-markdown)*.
-
