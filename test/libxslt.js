@@ -218,6 +218,37 @@ describe('node-libxslt', function() {
 		});
 	});
 
+	describe('implicitly omitted xml-declaration', function() {
+
+		it('should be respected by a stylesheet with output method html', function() {
+			var data='<root><strong></strong><!-- comment on xml data --></root>';
+			var stylesheetHtmlOut = libxslt.parse(fs.readFileSync('test/resources/implicit-omit-xml-declaration-html-out.xsl', 'utf8'));
+			var result = stylesheetHtmlOut.apply(data);
+			result.should.be.type('string');
+			result.should.not.match(/\?xml/);
+			result.should.match(/<foo\/>/);
+			result.should.match(/<strong><\/strong>/);
+			result.should.match(/&lt;bar\/&gt;/);
+			result.should.not.match(/\<!-- comment/);
+			result.should.match(/\<node/);
+			result.should.match(/with text/);
+		});
+
+		it('should be respected by a stylesheet with output method text', function() {
+			var data='<root><strong>some text </strong><!-- comment on xml data --></root>';
+			var stylesheetTextOut = libxslt.parse(fs.readFileSync('test/resources/implicit-omit-xml-declaration-text-out.xsl', 'utf8'));
+			var result = stylesheetTextOut.apply(data);
+			result.should.be.type('string');
+			result.should.not.match(/\?xml/);
+			result.should.match(/<foo\/>/);
+			result.should.match(/<bar\/>/);
+			result.should.not.match(/\<!-- comment/);
+			result.should.not.match(/\<node/);
+			result.should.not.match(/\<strong/);
+			result.should.match(/some text with text/);
+		});
+	});
+
 	describe('libexslt bindings', function(){
 		it('should expose EXSLT functions', function(callback){
 			libxslt.parseFile('test/resources/min-value.xsl', function(err, stylesheet){
