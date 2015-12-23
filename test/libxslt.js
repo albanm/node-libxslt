@@ -249,6 +249,30 @@ describe('node-libxslt', function() {
 		});
 	});
 
+	describe('handle quotes in strings', function() {
+
+		it('should avoid conflict with xpath single quote by using double-quotes', function() {
+			var data='<root/>';
+			var  xslDoc = libxslt.parse(fs.readFileSync('test/resources/handle-quotes-in-string-params.xsl', 'utf8'));
+			var result = xslDoc.apply(data,{strParam:"/root/item[@id='123']"});
+			result.should.match(/strParam:\/root\/item\[@id='123'\]/);
+		});
+
+	});
+
+	describe('no params wrap', function() {
+
+		it('should bypass parameter string wrap and deliver xpath expressions for nodesets', function() {
+			var data='<root><item id="123">Ok 123</item><item id="321"/><other/></root>';
+			var  xslDoc = libxslt.parse(fs.readFileSync('test/resources/use-xpath-params.xsl', 'utf8'));
+			var result = xslDoc.apply(data,{at:"/root/item[@id='123']",testName:"'testing xpath selectors'"},{noWrapParams:true});
+			result.should.match(/testing xpath selectors/);
+			result.should.match(/#selected nodes:1/);
+			result.should.match(/Node \[item id:123\] was selected./);
+		});
+
+	});
+
 	describe('libexslt bindings', function(){
 		it('should expose EXSLT functions', function(callback){
 			libxslt.parseFile('test/resources/min-value.xsl', function(err, stylesheet){
