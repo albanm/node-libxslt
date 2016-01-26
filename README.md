@@ -122,89 +122,143 @@ Node-libxslt depends on [node-gyp](https://github.com/TooTallNate/node-gyp), you
 
 API Reference
 =============
-Node.js bindings for libxslt compatible with libxmljs
-
-**Members**
-
-* [libxslt](#module_libxslt)
-  * [libxslt.libxmljs](#module_libxslt.libxmljs)
-  * [libxslt.parse(source, [callback])](#module_libxslt.parse)
-  * [libxslt.parseFile(sourcePath, callback)](#module_libxslt.parseFile)
-  * [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
-    * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
-    * [stylesheet.apply(source, [params], [options], [callback])](#module_libxslt..Stylesheet#apply)
-    * [stylesheet.applyToFile(sourcePath, [params], [options], callback)](#module_libxslt..Stylesheet#applyToFile)
+  Node.js bindings for libxslt compatible with libxmljs
 
 <a name="module_libxslt.libxmljs"></a>
-##libxslt.libxmljs
+### libxslt.libxmljs
 The libxmljs module. Prevents the need for a user's code to require it a second time. Also prevent weird bugs.
 
+**Kind**: static property of <code>[libxslt](#module_libxslt)</code>  
 <a name="module_libxslt.parse"></a>
-##libxslt.parse(source, [callback])
+### libxslt.parse(source, [callback]) ⇒ <code>Stylesheet</code>
 Parse a XSL stylesheet
 
 If no callback is given the function will run synchronously and return the result or throw an error.
 
-**Params**
+**Kind**: static method of <code>[libxslt](#module_libxslt)</code>  
+**Returns**: <code>Stylesheet</code> - Only if no callback is given.  
 
-- source `string` | `Document` - The content of the stylesheet as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
-- \[callback\] <code>[parseCallback](#parseCallback)</code> - The callback that handles the response. Expects err and Stylesheet object.  
+| Param | Type | Description |
+| --- | --- | --- |
+| source | <code>string</code> &#124; <code>Document</code> | The content of the stylesheet as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document) |
+| [callback] | <code>parseCallback</code> | The callback that handles the response. Expects err and Stylesheet object. |
 
-**Returns**: `Stylesheet` - Only if no callback is given.  
 <a name="module_libxslt.parseFile"></a>
-##libxslt.parseFile(sourcePath, callback)
+### libxslt.parseFile(sourcePath, callback)
 Parse a XSL stylesheet
 
-**Params**
+**Kind**: static method of <code>[libxslt](#module_libxslt)</code>  
 
-- sourcePath `stringPath` - The path of the file  
-- callback <code>[parseFileCallback](#parseFileCallback)</code> - The callback that handles the response. Expects err and Stylesheet object.  
+| Param | Type | Description |
+| --- | --- | --- |
+| sourcePath | <code>stringPath</code> | The path of the file |
+| callback | <code>parseFileCallback</code> | The callback that handles the response. Expects err and Stylesheet object. |
 
 <a name="module_libxslt..Stylesheet"></a>
-##class: libxslt~Stylesheet
-**Members**
+### libxslt~Stylesheet
+**Kind**: inner class of <code>[libxslt](#module_libxslt)</code>  
 
-* [class: libxslt~Stylesheet](#module_libxslt..Stylesheet)
-  * [new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet)
-  * [stylesheet.apply(source, [params], [options], [callback])](#module_libxslt..Stylesheet#apply)
-  * [stylesheet.applyToFile(sourcePath, [params], [options], callback)](#module_libxslt..Stylesheet#applyToFile)
+* [~Stylesheet](#module_libxslt..Stylesheet)
+    * [new Stylesheet(stylesheetDoc, stylesheetObj)](#new_module_libxslt..Stylesheet_new)
+    * [.apply(source, [params], [options], [callback])](#module_libxslt..Stylesheet+apply) ⇒ <code>string</code> &#124; <code>Document</code>
+    * [.applyToFile(sourcePath, [params], [options], callback)](#module_libxslt..Stylesheet+applyToFile)
 
-<a name="new_module_libxslt..Stylesheet"></a>
-###new libxslt~Stylesheet(stylesheetDoc, stylesheetObj)
+<a name="new_module_libxslt..Stylesheet_new"></a>
+#### new Stylesheet(stylesheetDoc, stylesheetObj)
 A compiled stylesheet. Do not call this constructor, instead use parse or parseFile.
 
 store both the source document and the parsed stylesheet
 if we don't store the stylesheet doc it will be deleted by garbage collector and it will result in segfaults.
 
-**Params**
 
-- stylesheetDoc `Document` - XML document source of the stylesheet  
-- stylesheetObj `Document` - Simple wrapper of a libxslt stylesheet  
+| Param | Type | Description |
+| --- | --- | --- |
+| stylesheetDoc | <code>Document</code> | XML document source of the stylesheet |
+| stylesheetObj | <code>Document</code> | Simple wrapper of a libxslt stylesheet |
 
-**Scope**: inner class of [libxslt](#module_libxslt)  
-<a name="module_libxslt..Stylesheet#apply"></a>
-###stylesheet.apply(source, [params], [options], [callback])
+<a name="module_libxslt..Stylesheet+apply"></a>
+#### stylesheet.apply(source, [params], [options], [callback]) ⇒ <code>string</code> &#124; <code>Document</code>
 Apply a stylesheet to a XML document
 
 If no callback is given the function will run synchronously and return the result or throw an error.
 
-**Params**
+**Kind**: instance method of <code>[Stylesheet](#module_libxslt..Stylesheet)</code>  
+**Returns**: <code>string</code> &#124; <code>Document</code> - Only if no callback is given. Type is the same as the source param.  
 
-- source `string` | `Document` - The XML content to apply the stylesheet to given as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document)  
-- \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
-- \[options\] `object` - Additional parameters. For now only string 'outputFormat' is supported to force the type of the output, values are 'document' or 'string'.  
-- \[callback\] <code>[applyCallback](#Stylesheet..applyCallback)</code> - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.  
+| Param | Type | Description |
+| --- | --- | --- |
+| source | <code>string</code> &#124; <code>Document</code> | The XML content to apply the stylesheet to given as a string or a [libxmljs document](https://github.com/polotek/libxmljs/wiki/Document) |
+| [params] | <code>object</code> | Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp)) |
+| [options] | <code>applyOptions</code> | Options |
+| [callback] | <code>applyCallback</code> | The callback that handles the response. Expects err and result of the same type as the source param passed to apply. |
 
-**Returns**: `string` | `Document` - Only if no callback is given. Type is the same as the source param.  
-<a name="module_libxslt..Stylesheet#applyToFile"></a>
-###stylesheet.applyToFile(sourcePath, [params], [options], callback)
+<a name="module_libxslt..Stylesheet+applyToFile"></a>
+#### stylesheet.applyToFile(sourcePath, [params], [options], callback)
 Apply a stylesheet to a XML file
 
-**Params**
+**Kind**: instance method of <code>[Stylesheet](#module_libxslt..Stylesheet)</code>  
 
-- sourcePath `string` - The path of the file to read  
-- \[params\] `object` - Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp))  
-- \[options\] `object` - Additional parameters. For now only string 'outputFormat' is supported to force the type of the output, values are 'document' or 'string'.  
-- callback <code>[applyToFileCallback](#Stylesheet..applyToFileCallback)</code> - The callback that handles the response. Expects err and result as string.  
+| Param | Type | Description |
+| --- | --- | --- |
+| sourcePath | <code>string</code> | The path of the file to read |
+| [params] | <code>object</code> | Parameters passed to the stylesheet ([http://www.w3schools.com/xsl/el_with-param.asp](http://www.w3schools.com/xsl/el_with-param.asp)) |
+| [options] | <code>applyOptions</code> | Options |
+| callback | <code>applyToFileCallback</code> | The callback that handles the response. Expects err and result as string. |
+
+<a name="module_libxslt..parseCallback"></a>
+### libxslt~parseCallback : <code>function</code>
+Callback to the parse function
+
+**Kind**: inner typedef of <code>[libxslt](#module_libxslt)</code>  
+
+| Param | Type |
+| --- | --- |
+| [err] | <code>error</code> | 
+| [stylesheet] | <code>Stylesheet</code> | 
+
+<a name="module_libxslt..parseFileCallback"></a>
+### libxslt~parseFileCallback : <code>function</code>
+Callback to the parseFile function
+
+**Kind**: inner typedef of <code>[libxslt](#module_libxslt)</code>  
+
+| Param | Type |
+| --- | --- |
+| [err] | <code>error</code> | 
+| [stylesheet] | <code>Stylesheet</code> | 
+
+<a name="module_libxslt..applyOptions"></a>
+### libxslt~applyOptions
+Options for applying a stylesheet
+
+**Kind**: inner typedef of <code>[libxslt](#module_libxslt)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| outputFormat | <code>String</code> | Force the type of the output, either 'document' or 'string'. Default is to use the type of the input. |
+| noWrapParams | <code>boolean</code> | If true then the parameters are XPath expressions, otherwise they are treated as strings. Default is false. |
+
+<a name="module_libxslt..applyCallback"></a>
+### libxslt~applyCallback : <code>function</code>
+Callback to the Stylesheet.apply function
+
+**Kind**: inner typedef of <code>[libxslt](#module_libxslt)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [err] | <code>error</code> | Error either from parsing the XML document if given as a string or from applying the styleshet |
+| [result] | <code>string</code> &#124; <code>Document</code> | Result of the same type as the source param passed to apply |
+
+<a name="module_libxslt..applyToFileCallback"></a>
+### libxslt~applyToFileCallback : <code>function</code>
+Callback to the Stylesheet.applyToFile function
+
+**Kind**: inner typedef of <code>[libxslt](#module_libxslt)</code>  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| [err] | <code>error</code> | Error either from reading the file, parsing the XML document or applying the styleshet |
+| [result] | <code>string</code> |  |
 
 *documented by [jsdoc-to-markdown](https://github.com/75lb/jsdoc-to-markdown)*.
