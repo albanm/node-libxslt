@@ -85,14 +85,21 @@ exports.parseFile = function(sourcePath, callback) {
  */
 
 /**
+ * Options for applying a stylesheet
+ * @typedef applyOptions
+ * @property {String} outputFormat - Force the type of the output, either 'document' or 'string'. Default is to use the type of the input.
+ * @property {boolean} noWrapParams - If true then the parameters are XPath expressions, otherwise they are treated as strings. Default is false.
+ */
+
+/**
  * Apply a stylesheet to a XML document
  *
  * If no callback is given the function will run synchronously and return the result or throw an error.
  *
  * @param {string|Document} source - The XML content to apply the stylesheet to given as a string or a [libxmljs document]{@link https://github.com/polotek/libxmljs/wiki/Document}
  * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
- * @param {object} [options] - Additional parameters. For now only string 'outputFormat' is supported to force the type of the output, values are 'document' or 'string'.
- * @param {Stylesheet~applyCallback} [callback] - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.
+ * @param {applyOptions} [options] - Options
+ * @param {applyCallback} [callback] - The callback that handles the response. Expects err and result of the same type as the source param passed to apply.
  * @return {string|Document} Only if no callback is given. Type is the same as the source param.
  */
 Stylesheet.prototype.apply = function(source, params, options, callback) {
@@ -156,7 +163,7 @@ Stylesheet.prototype.apply = function(source, params, options, callback) {
 
 /**
  * Callback to the Stylesheet.apply function
- * @callback Stylesheet~applyCallback
+ * @callback applyCallback
  * @param {error} [err] - Error either from parsing the XML document if given as a string or from applying the styleshet
  * @param {string|Document} [result] Result of the same type as the source param passed to apply
  */
@@ -166,8 +173,8 @@ Stylesheet.prototype.apply = function(source, params, options, callback) {
  *
  * @param {string} sourcePath - The path of the file to read
  * @param {object} [params] - Parameters passed to the stylesheet ({@link http://www.w3schools.com/xsl/el_with-param.asp})
- * @param {object} [options] - Additional parameters. For now only string 'outputFormat' is supported to force the type of the output, values are 'document' or 'string'.
- * @param {Stylesheet~applyToFileCallback} callback The callback that handles the response. Expects err and result as string.
+ * @param {applyOptions} [options] - Options
+ * @param {applyToFileCallback} callback The callback that handles the response. Expects err and result as string.
  */
 Stylesheet.prototype.applyToFile = function(sourcePath, params, options, callback) {
 	var that = this;
@@ -178,7 +185,7 @@ Stylesheet.prototype.applyToFile = function(sourcePath, params, options, callbac
 };
 /**
  * Callback to the Stylesheet.applyToFile function
- * @callback Stylesheet~applyToFileCallback
+ * @callback applyToFileCallback
  * @param {error} [err] - Error either from reading the file, parsing the XML document or applying the styleshet
  * @param {string} [result]
  */
