@@ -1,5 +1,4 @@
 #define BUILDING_NODE_EXTENSION
-#include <iostream>
 #include <node.h>
 #include <nan.h>
 #include <libxslt/xslt.h>
@@ -125,8 +124,9 @@ NAN_METHOD(ApplySync) {
       unsigned char* resStr;
       int len;
       xsltSaveResultToString(&resStr,&len,result,stylesheet->stylesheet_obj);
+      const char* resOrEmpty = resStr ? reinterpret_cast<char*>(resStr) : "";
       xmlFreeDoc(result);
-      info.GetReturnValue().Set(Nan::New<String>((char*)resStr).ToLocalChecked());
+      info.GetReturnValue().Set(Nan::New<String>(resOrEmpty).ToLocalChecked());
     } else {
       // Fill a result libxmljs document.
       // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
@@ -186,14 +186,13 @@ class ApplyWorker : public Nan::AsyncWorker {
     } else {
       unsigned char* resStr;
       int len;
-      int cnt=xsltSaveResultToString(&resStr,&len,result,stylesheet->stylesheet_obj);
+      int cnt = xsltSaveResultToString(&resStr,&len,result,stylesheet->stylesheet_obj);
+	  const char* resOrEmpty = resStr ? reinterpret_cast<char*>(resStr) : "";
       xmlFreeDoc(result);
-      Local<Value> argv[] = { Nan::Null(), Nan::New<String>((char*)resStr).ToLocalChecked()};
+      Local<Value> argv[] = { Nan::Null(), Nan::New<String>(resOrEmpty).ToLocalChecked()};
       freeArray(params, paramsLength);
       callback->Call(2, argv);
     }
-
-
   };
 
  private:
@@ -211,6 +210,7 @@ NAN_METHOD(ApplyAsync) {
     Nan::HandleScope scope;
 
     Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(info[0]->ToObject());
+
     libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[1]->ToObject());
     Handle<Array> paramsArray = Handle<Array>::Cast(info[2]);
     bool outputString = info[3]->BooleanValue();
@@ -224,7 +224,6 @@ NAN_METHOD(ApplyAsync) {
     char** params = PrepareParams(paramsArray);
 
     ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), outputString, docResult, callback);
-    for (uint32_t i = 0; i < 5; ++i) worker->SaveToPersistent(i, info[i]);
     Nan::AsyncQueueWorker(worker);
     return;
 }
