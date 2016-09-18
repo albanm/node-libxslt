@@ -127,6 +127,7 @@ NAN_METHOD(ApplySync) {
       const char* resOrEmpty = resStr ? reinterpret_cast<char*>(resStr) : "";
       xmlFreeDoc(result);
       info.GetReturnValue().Set(Nan::New<String>(resOrEmpty).ToLocalChecked());
+      if (resStr) xmlFree(resStr);
     } else {
       // Fill a result libxmljs document.
       // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
@@ -187,9 +188,10 @@ class ApplyWorker : public Nan::AsyncWorker {
       unsigned char* resStr;
       int len;
       int cnt = xsltSaveResultToString(&resStr,&len,result,stylesheet->stylesheet_obj);
-	  const char* resOrEmpty = resStr ? reinterpret_cast<char*>(resStr) : "";
+      const char* resOrEmpty = resStr ? reinterpret_cast<char*>(resStr) : "";
       xmlFreeDoc(result);
       Local<Value> argv[] = { Nan::Null(), Nan::New<String>(resOrEmpty).ToLocalChecked()};
+      if (resStr) xmlFree(resStr);
       freeArray(params, paramsLength);
       callback->Call(2, argv);
     }
@@ -224,6 +226,7 @@ NAN_METHOD(ApplyAsync) {
     char** params = PrepareParams(paramsArray);
 
     ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), outputString, docResult, callback);
+    worker->SaveToPersistent("xmlDoc", info[1]);
     Nan::AsyncQueueWorker(worker);
     return;
 }
