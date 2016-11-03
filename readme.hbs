@@ -41,7 +41,7 @@ The libxmljs module required by node-libxslt is exposed as ```require('libxslt')
 It is possible to work with libxmljs documents instead of strings:
 
 ```js
-var lixslt = require('libxslt');
+var libxslt = require('libxslt');
 var libxmljs = libxslt.libxmljs;
 
 var stylesheetObj = libxmljs.parseXml(stylesheetString, { nocdata: true });
@@ -72,7 +72,7 @@ The same *parse()* and *apply()* functions can be used in synchronous mode simpl
 In this case if a parsing error occurs it will be thrown.
 
 ```js
-var lixslt = require('libxslt');
+var libxslt = require('libxslt');
 
 var stylesheet = libxslt.parse(stylesheetString);
 
