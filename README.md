@@ -10,7 +10,14 @@ Node.js bindings for [libxslt](http://xmlsoft.org/libxslt/) compatible with [lib
 Installation
 ------------
 
-	npm install libxslt
+    npm install libxslt
+
+From source:
+
+    git clone https://github.com/albanm/node-libxslt.git
+		git submodule update --init
+		npm install
+		npm test
 
 Basic usage
 -----------
@@ -56,7 +63,7 @@ stylesheet.apply(document, function(err, result){
 
 This is only useful if you already needed to parse a document before applying the stylesheet for previous manipulations.
 Or if you wish to be returned a document instead of a string for ulterior manipulations.
-In these cases you will prevent extraneous parsings and serializations.	
+In these cases you will prevent extraneous parsings and serializations.
 
 Includes
 --------
@@ -213,8 +220,8 @@ Callback to the parse function
 
 | Param | Type |
 | --- | --- |
-| [err] | <code>error</code> | 
-| [stylesheet] | <code>Stylesheet</code> | 
+| [err] | <code>error</code> |
+| [stylesheet] | <code>Stylesheet</code> |
 
 <a name="module_libxslt..parseFileCallback"></a>
 ### libxslt~parseFileCallback : <code>function</code>
@@ -224,8 +231,8 @@ Callback to the parseFile function
 
 | Param | Type |
 | --- | --- |
-| [err] | <code>error</code> | 
-| [stylesheet] | <code>Stylesheet</code> | 
+| [err] | <code>error</code> |
+| [stylesheet] | <code>Stylesheet</code> |
 
 <a name="module_libxslt..applyOptions"></a>
 ### libxslt~applyOptions
