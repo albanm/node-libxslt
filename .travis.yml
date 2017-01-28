@@ -7,9 +7,17 @@ node_js:
   - "6"
   - "7"
 env:
+  - CXX=g++-4.8
   matrix:
     - USE_LATEST_NODE_GYP=true
     - USE_LATEST_NODE_GYP=false
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 
 before_install:
   - if [ $USE_LATEST_NODE_GYP == 'true' ]; then npm explore npm -g -- npm install node-gyp@latest; fi;
