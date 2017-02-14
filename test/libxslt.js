@@ -128,6 +128,17 @@ describe('node-libxslt', function() {
 			result.should.be.type('string');
 			result.should.match(/<p>My param: MyParamValue<\/p>/);
 		});
+		it('should apply a stylesheet with the same parameter multiple times', function() {
+			var params = {
+				MyParam: 'MyParamValue'
+			}
+			var result = stylesheet.apply(docSource, params);
+			result.should.be.type('string');
+			result.should.match(/<p>My param: MyParamValue<\/p>/);
+			result = stylesheet.apply(docSource, params);
+			result.should.be.type('string');
+			result.should.match(/<p>My param: MyParamValue<\/p>/);
+		});
 	});
 
 	describe('asynchronous apply function', function() {

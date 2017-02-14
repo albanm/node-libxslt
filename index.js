@@ -116,11 +116,15 @@ Stylesheet.prototype.apply = function(source, params, options, callback) {
 	params = params || {};
 	options = options || {};
 
-	if (!options.noWrapParams)
+	if (!options.noWrapParams) {
+		var wrappedParams = {}
 	  for(var p in params) {
 	    // string parameters must be surrounded by quotes to be usable by the stylesheet
-	    if (typeof params[p] === 'string') params[p] = '"' + params[p] + '"';
+	    if (typeof params[p] === 'string') wrappedParams[p] = '"' + params[p] + '"';
+			else wrappedParams[i] = params[p]
 	  }
+		params = wrappedParams
+	}
 
 	// Output format can be passed as explicit option or
 	// is implicit and mapped to the input format
