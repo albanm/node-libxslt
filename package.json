@@ -1,6 +1,6 @@
 {
   "name": "libxslt",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
   "scripts": {
