@@ -117,13 +117,13 @@ Stylesheet.prototype.apply = function(source, params, options, callback) {
 	options = options || {};
 
 	if (!options.noWrapParams) {
-		var wrappedParams = {}
+		var wrappedParams = {};
 	  for(var p in params) {
 	    // string parameters must be surrounded by quotes to be usable by the stylesheet
 	    if (typeof params[p] === 'string') wrappedParams[p] = '"' + params[p] + '"';
-			else wrappedParams[i] = params[p]
+			else wrappedParams[p] = params[p];
 	  }
-		params = wrappedParams
+		params = wrappedParams;
 	}
 
 	// Output format can be passed as explicit option or
