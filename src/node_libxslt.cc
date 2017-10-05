@@ -15,6 +15,8 @@
 
 using namespace v8;
 
+int vasprintf (char **strp, const char *fmt, va_list ap);
+
 static xmlDoc* copyDocument(Local<Value> input) {
     libxmljs::XmlDocument* docWrapper =
         Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(input->ToObject());
@@ -22,14 +24,30 @@ static xmlDoc* copyDocument(Local<Value> input) {
     return xmlCopyDoc(stylesheetDoc, true);
 }
 
+// Directly inspired by nokogiri:
+// https://github.com/sparklemotion/nokogiri/blob/24bb843327306d2d71e4b2dc337c1e327cbf4516/ext/nokogiri/xslt_stylesheet.c#L76
+static void xslt_generic_error_handler(void * ctx, const char *msg, ...)
+{
+  char * message;
+  va_list args;
+  va_start(args, msg);
+  vasprintf(&message, msg, args);
+  va_end(args);
+  strncpy((char*)ctx, message, 2048);
+  free(message);
+}
+
 NAN_METHOD(StylesheetSync) {
     Nan::HandleScope scope;
+    char* errstr = new char[2048];
+    xsltSetGenericErrorFunc(errstr, xslt_generic_error_handler);
     xmlDoc* doc = copyDocument(info[0]);
     xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc);
-    // TODO fetch actual error.
+    xsltSetGenericErrorFunc(NULL, NULL);
+
     if (!stylesheet) {
         xmlFreeDoc(doc);
-        return Nan::ThrowError("Could not parse XML string as XSLT stylesheet");
+        return Nan::ThrowError(errstr);
     }
 
     Local<Object> stylesheetWrapper = Stylesheet::New(stylesheet);
@@ -50,7 +68,12 @@ class StylesheetWorker : public Nan::AsyncWorker {
   // should go on `this`.
   void Execute () {
     libxmljs::WorkerSentinel workerSentinel(workerParent);
+
+    // Error management is probably not really thread safe :(
+    errstr = new char[2048];;
+    xsltSetGenericErrorFunc(errstr, xslt_generic_error_handler);
     result = xsltParseStylesheetDoc(doc);
+    xsltSetGenericErrorFunc(NULL, NULL);
   }
 
   // Executed when the async work is complete
@@ -60,7 +83,7 @@ class StylesheetWorker : public Nan::AsyncWorker {
     Nan::HandleScope scope;
     if (!result) {
         xmlFreeDoc(doc);
-        Local<Value> argv[] = { Nan::Error("Failed to parse stylesheet") };
+        Local<Value> argv[] = { Nan::Error(errstr) };
         callback->Call(1, argv);
     } else {
         Local<Object> resultWrapper = Stylesheet::New(result);
@@ -73,6 +96,7 @@ class StylesheetWorker : public Nan::AsyncWorker {
   libxmljs::WorkerParent workerParent;
   xmlDoc* doc;
   xsltStylesheetPtr result;
+  char* errstr;
 };
 
 NAN_METHOD(StylesheetAsync) {

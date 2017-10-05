@@ -4,59 +4,38 @@ var should = require('should');
 
 var libxslt = require('../index');
 
+var stylesheetSource = fs.readFileSync('./test/resources/cd.xsl', 'utf8');
+var docSource = fs.readFileSync('./test/resources/cd.xml', 'utf8');
+var stylesheetIncludeSource = fs.readFileSync('./test/resources/xslinclude.xsl', 'utf8');
+var stylesheetBadIncludeSource = fs.readFileSync('./test/resources/xslbadinclude.xsl', 'utf8');
+var stylesheetBadParamSource = fs.readFileSync('./test/resources/xslbadparam.xsl', 'utf8');
+var doc2Source = fs.readFileSync('./test/resources/collection.xml', 'utf8')
+
 describe('node-libxslt', function() {
-	var stylesheetSource;
-	before(function(callback) {
-		fs.readFile('./test/resources/cd.xsl', 'utf8', function(err, data) {
-			stylesheetSource = data;
-			callback(err);
-		});
-	});
-	var docSource;
-	before(function(callback) {
-		fs.readFile('./test/resources/cd.xml', 'utf8', function(err, data) {
-			docSource = data;
-			callback(err);
-		});
-	});
-
-	var stylesheetIncludeSource;
-	before(function(callback) {
-		fs.readFile('./test/resources/xslinclude.xsl', 'utf8', function(err, data) {
-			stylesheetIncludeSource = data;
-			callback(err);
-		});
-	});
-
-	var doc2Source;
-	before(function(callback) {
-		fs.readFile('./test/resources/collection.xml', 'utf8', function(err, data) {
-			doc2Source = data;
-			callback(err);
-		});
-	});
-
-	var stylesheet;
-	var stylesheetInclude;
 	describe('synchronous parse function', function() {
 		it('should parse a stylesheet from a libxslt.libxmljs xml document', function() {
 			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetSource);
-			stylesheet = libxslt.parse(stylesheetDoc);
+			var stylesheet = libxslt.parse(stylesheetDoc);
 			stylesheet.should.be.type('object');
 		});
 		it('should parse a stylesheet from a xml string', function() {
-			stylesheet = libxslt.parse(stylesheetSource);
+			var stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.should.be.type('object');
 		});
 		it('should parse a stylesheet with a include from a xml string', function() {
 			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetIncludeSource);
-			stylesheetInclude = libxslt.parse(stylesheetDoc);
+			var stylesheetInclude = libxslt.parse(stylesheetDoc);
 			stylesheetInclude.should.be.type('object');
 		});
 		it('should throw an error when parsing invalid stylesheet', function() {
 			(function() {
 				libxslt.parse('this is not a stylesheet!');
 			}).should.throw();
+		});
+		it('should throw an error when parsing stylesheet with invalid include', function() {
+			(function() {
+				libxslt.parse(stylesheetBadIncludeSource);
+			}).should.throw(/unable to load/);
 		});
 	});
 
@@ -96,32 +75,45 @@ describe('node-libxslt', function() {
 				callback();
 			});
 		});
+		it('should throw an error when parsing stylesheet with invalid include', function(callback) {
+			libxslt.parse(stylesheetBadIncludeSource, function(err) {
+				should.exist(err);
+				err.message.should.match(/unable to load/)
+				callback();
+			});
+		})
 	});
 
 	describe('synchronous apply function', function() {
 		it('should apply a stylesheet to a libxslt.libxmljs xml document', function() {
 			var doc = libxslt.libxmljs.parseXml(docSource);
+			var stylesheet = libxslt.parse(stylesheetSource);
 			var result = stylesheet.apply(doc);
 			result.should.be.type('object');
 			result.toString().should.match(/<td>Bob Dylan<\/td>/);
 		});
 		it('should apply a stylesheet to a libxslt.libxmljs xml document and force output as string', function() {
 			var doc = libxslt.libxmljs.parseXml(docSource);
+			var stylesheetDoc = libxslt.libxmljs.parseXml(stylesheetIncludeSource);
+			var stylesheet = libxslt.parse(stylesheetSource);
 			var result = stylesheet.apply(doc, {}, {outputFormat: 'string'});
 			result.should.be.type('string');
 			result.should.match(/<td>Bob Dylan<\/td>/);
 		});
 		it('should apply a stylesheet to a xml string', function() {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			var result = stylesheet.apply(docSource);
 			result.should.be.type('string');
 			result.should.match(/<td>Bob Dylan<\/td>/);
 		});
 		it('should apply a stylesheet to a xml string and force output as document', function() {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			var result = stylesheet.apply(docSource, {}, {outputFormat: 'document'});
 			result.should.be.type('object');
 			result.toString().should.match(/<td>Bob Dylan<\/td>/);
 		});
 		it('should apply a stylesheet with a parameter', function() {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			var result = stylesheet.apply(docSource, {
 				MyParam: 'MyParamValue'
 			});
@@ -129,6 +121,7 @@ describe('node-libxslt', function() {
 			result.should.match(/<p>My param: MyParamValue<\/p>/);
 		});
 		it('should apply a stylesheet with the same parameter multiple times', function() {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			var params = {
 				MyParam: 'MyParamValue'
 			}
@@ -139,11 +132,19 @@ describe('node-libxslt', function() {
 			result.should.be.type('string');
 			result.should.match(/<p>My param: MyParamValue<\/p>/);
 		});
+		/*it.only('should throw an error if it fails to apply stylesheet', function() {
+			var stylesheet = libxslt.parse(stylesheetBadParamSource);
+			(function() {
+				result = stylesheet.apply('<data></data>');
+				console.log(result);
+			}).should.throw(/unable to load/);
+		});*/
 	});
 
 	describe('asynchronous apply function', function() {
 		it('should apply a stylesheet to a libxslt.libxmljs xml document', function(callback) {
 			var doc = libxslt.libxmljs.parseXml(docSource);
+			var stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.apply(doc, function(err, result) {
 				result.should.be.type('object');
 				result.toString().should.match(/<td>Bob Dylan<\/td>/);
@@ -152,6 +153,7 @@ describe('node-libxslt', function() {
 		});
 		it('should apply a stylesheet to a libxslt.libxmljs xml document and force output as string', function(callback) {
 			var doc = libxslt.libxmljs.parseXml(docSource);
+			var stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.apply(doc, {}, {outputFormat: 'string'}, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
@@ -159,6 +161,7 @@ describe('node-libxslt', function() {
 			});
 		});
 		it('should apply a stylesheet to a xml string', function(callback) {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.apply(docSource, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
@@ -166,6 +169,7 @@ describe('node-libxslt', function() {
 			});
 		});
 		it('should apply a stylesheet to a xml string and force output as document', function(callback) {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.apply(docSource, {}, {outputFormat: 'document'}, function(err, result) {
 				result.should.be.type('object');
 				result.toString().should.match(/<td>Bob Dylan<\/td>/);
@@ -173,6 +177,7 @@ describe('node-libxslt', function() {
 			});
 		});
 		it('should apply a stylesheet with a include to a xml string', function(callback) {
+			var stylesheetInclude = libxslt.parse(stylesheetIncludeSource);
 			stylesheetInclude.apply(doc2Source, function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/Title - Lover Birds/);
@@ -183,6 +188,7 @@ describe('node-libxslt', function() {
 
 	describe('applyToFile function', function() {
 		it('should apply a stylesheet to a xml file', function(callback) {
+			var stylesheet = libxslt.parse(stylesheetSource);
 			stylesheet.applyToFile('./test/resources/cd.xml', function(err, result) {
 				result.should.be.type('string');
 				result.should.match(/<td>Bob Dylan<\/td>/);
@@ -286,6 +292,7 @@ describe('node-libxslt', function() {
 
 	describe('libexslt bindings', function(){
 		it('should expose EXSLT functions', function(callback){
+			var stylesheet = libxslt.parse(stylesheetSource);
 			libxslt.parseFile('test/resources/min-value.xsl', function(err, stylesheet){
 				should.not.exist(err);
 				stylesheet.applyToFile('test/resources/values.xml', function(err, result){
