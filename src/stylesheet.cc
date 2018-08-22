@@ -27,7 +27,7 @@ void Stylesheet::Init(Handle<Object> exports) {
 Local<Object> Stylesheet::New(xsltStylesheetPtr stylesheetPtr) {
     Nan::EscapableHandleScope scope;
     //Local<Object> wrapper = Nan::New(constructor)->NewInstance();
-    Local<Object> wrapper = Nan::NewInstance(Nan::New(constructor)->GetFunction()).ToLocalChecked();	
+    Local<Object> wrapper = Nan::NewInstance(Nan::New(constructor)).ToLocalChecked();	
     Stylesheet* stylesheet = new Stylesheet(stylesheetPtr);
     stylesheet->Wrap(wrapper);
     return scope.Escape(wrapper);
