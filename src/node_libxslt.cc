@@ -31,7 +31,7 @@ using namespace v8;
 
 static xmlDoc* copyDocument(Local<Value> input) {
     libxmljs::XmlDocument* docWrapper =
-        Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(input->ToObject());
+        Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(Nan::To<v8::Object>(input).ToLocalChecked());
     xmlDoc* stylesheetDoc = docWrapper->xml_obj;
     return xmlCopyDoc(stylesheetDoc, true);
 }
@@ -129,26 +129,26 @@ void freeArray(char **array, int size) {
 }
 // transform a v8 array into a char** to pass params to xsl transform
 // inspired by https://github.com/bsuh/node_xslt/blob/master/node_xslt.cc
-char** PrepareParams(Handle<Array> array) {
+char** PrepareParams(Local<Array> array, Isolate *isolate) {
     uint32_t arrayLen = array->Length();
     char** params = (char **)malloc(sizeof(char *) * (arrayLen + 1));
     memset(params, 0, sizeof(char *) * (array->Length() + 1));
     for (unsigned int i = 0; i < array->Length(); i++) {
-        Local<String> param = array->Get(Nan::New<Integer>(i))->ToString();
-        params[i] = (char *)malloc(sizeof(char) * (param->Utf8Length() + 1));
-        param->WriteUtf8(params[i]);
+        Local<String> param = Nan::To<v8::String>(Nan::Get(array, i).ToLocalChecked()).ToLocalChecked();
+        params[i] = (char *)malloc(sizeof(char) * (param->Utf8Length(isolate) + 1));
+        param->WriteUtf8(isolate, params[i]);
     }
     return params;
 }
 
 NAN_METHOD(ApplySync) {
     Nan::HandleScope scope;
-    Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(info[0]->ToObject());
-    libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[1]->ToObject());
-    Handle<Array> paramsArray = Handle<Array>::Cast(info[2]);
-    bool outputString = info[3]->BooleanValue();
+    Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(Nan::To<v8::Object>(info[0]).ToLocalChecked());
+    libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(Nan::To<v8::Object>(info[1]).ToLocalChecked());
+    Local<Array> paramsArray = Local<Array>::Cast(info[2]);
+    bool outputString = Nan::To<v8::Boolean>(info[3]).ToLocalChecked()->Value();
 
-    char** params = PrepareParams(paramsArray);
+    char** params = PrepareParams(paramsArray, info.GetIsolate());
 
     xmlDoc* result = xsltApplyStylesheet(stylesheet->stylesheet_obj, docSource->xml_obj, (const char **)params);
     if (!result) {
@@ -169,7 +169,7 @@ NAN_METHOD(ApplySync) {
       // for some obscure reason I didn't manage to create a new libxmljs document in applySync,
     	// but passing a document by reference and modifying its content works fine
       // replace the empty document in docResult with the result of the stylesheet
-      libxmljs::XmlDocument* docResult = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[4]->ToObject());
+      libxmljs::XmlDocument* docResult = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(Nan::To<v8::Object>(info[4]).ToLocalChecked());
       docResult->xml_obj->_private = NULL;
       xmlFreeDoc(docResult->xml_obj);
       docResult->xml_obj = result;
@@ -248,18 +248,18 @@ class ApplyWorker : public Nan::AsyncWorker {
 NAN_METHOD(ApplyAsync) {
     Nan::HandleScope scope;
 
-    Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(info[0]->ToObject());
-    libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[1]->ToObject());
-    Handle<Array> paramsArray = Handle<Array>::Cast(info[2]);
-    bool outputString = info[3]->BooleanValue();
+    Stylesheet* stylesheet = Nan::ObjectWrap::Unwrap<Stylesheet>(Nan::To<v8::Object>(info[0]).ToLocalChecked());
+    libxmljs::XmlDocument* docSource = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(Nan::To<v8::Object>(info[1]).ToLocalChecked());
+    Local<Array> paramsArray = Local<Array>::Cast(info[2]);
+    bool outputString = Nan::To<v8::Boolean>(info[3]).ToLocalChecked()->Value();
 
     //if (!outputString) {
-    libxmljs::XmlDocument* docResult = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(info[4]->ToObject());
+    libxmljs::XmlDocument* docResult = Nan::ObjectWrap::Unwrap<libxmljs::XmlDocument>(Nan::To<v8::Object>(info[4]).ToLocalChecked());
     //}
 
     Nan::Callback *callback = new Nan::Callback(info[5].As<Function>());
 
-    char** params = PrepareParams(paramsArray);
+    char** params = PrepareParams(paramsArray, info.GetIsolate());
 
     ApplyWorker* worker = new ApplyWorker(stylesheet, docSource, params, paramsArray->Length(), outputString, docResult, callback);
     for (uint32_t i = 0; i < 5; ++i) worker->SaveToPersistent(i, info[i]);
@@ -273,12 +273,12 @@ NAN_METHOD(RegisterEXSLT) {
 }
 
 // Compose the module by assigning the methods previously prepared
-void InitAll(Handle<Object> exports) {
+void InitAll(Local<Object> exports) {
   	Stylesheet::Init(exports);
-  	exports->Set(Nan::New<String>("stylesheetSync").ToLocalChecked(), Nan::New<FunctionTemplate>(StylesheetSync)->GetFunction());
-    exports->Set(Nan::New<String>("stylesheetAsync").ToLocalChecked(), Nan::New<FunctionTemplate>(StylesheetAsync)->GetFunction());
-  	exports->Set(Nan::New<String>("applySync").ToLocalChecked(), Nan::New<FunctionTemplate>(ApplySync)->GetFunction());
-    exports->Set(Nan::New<String>("applyAsync").ToLocalChecked(), Nan::New<FunctionTemplate>(ApplyAsync)->GetFunction());
-    exports->Set(Nan::New<String>("registerEXSLT").ToLocalChecked(), Nan::New<FunctionTemplate>(RegisterEXSLT)->GetFunction());
+  	exports->Set(Nan::New<String>("stylesheetSync").ToLocalChecked(),Nan::GetFunction(Nan::New<FunctionTemplate>(StylesheetSync)).ToLocalChecked());
+    exports->Set(Nan::New<String>("stylesheetAsync").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(StylesheetAsync)).ToLocalChecked());
+  	exports->Set(Nan::New<String>("applySync").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(ApplySync)).ToLocalChecked());
+    exports->Set(Nan::New<String>("applyAsync").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(ApplyAsync)).ToLocalChecked());
+    exports->Set(Nan::New<String>("registerEXSLT").ToLocalChecked(), Nan::GetFunction(Nan::New<FunctionTemplate>(RegisterEXSLT)).ToLocalChecked());
 }
 NODE_MODULE(node_libxslt, InitAll);

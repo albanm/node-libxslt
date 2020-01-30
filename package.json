@@ -1,6 +1,6 @@
 {
   "name": "node10-libxslt",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "[Fork] Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
   "scripts": {
@@ -29,8 +29,8 @@
   "license": "MIT",
   "dependencies": {
     "bindings": "^1.3.0",
-    "libxmljs-mt": "git+https://github.com/renanccastro/libxmljs.git",
-    "nan": "~2.10.0"
+    "node1-libxmljsmt": "1.0.0",
+    "nan": "~2.14.0"
   },
   "devDependencies": {
     "async": "~0.9.0",

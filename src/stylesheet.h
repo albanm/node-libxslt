@@ -10,7 +10,7 @@
 
 class Stylesheet : public Nan::ObjectWrap {
 	public:
-	    static void Init(v8::Handle<v8::Object> exports);
+	    static void Init(v8::Local<v8::Object> exports);
 	    static v8::Local<v8::Object> New(xsltStylesheetPtr stylesheetPtr);
 	    static NAN_METHOD(TransformSync);
 	    xsltStylesheetPtr stylesheet_obj;
