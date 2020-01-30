@@ -1,7 +1,7 @@
 {
-  "name": "libxslt",
+  "name": "node10-libxslt",
   "version": "0.7.0",
-  "description": "Node.js bindings for libxslt compatible with libxmljs",
+  "description": "[Fork] Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec",
@@ -15,21 +15,21 @@
     "bindings"
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
-  "homepage": "https://github.com/alexdee2007/node-libxslt",
+  "homepage": "https://github.com/renanccastro/node-libxslt",
   "contributors": [
     "Rui Azevedo <ruihfazevedo@gmail.com> (http://www.r-site.net/)"
   ],
   "bugs": {
-    "url": "https://github.com/alexdee2007/node-libxslt/issues"
+    "url": "https://github.com/renanccastro/node-libxslt/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alexdee2007/node-libxslt.git"
+    "url": "https://github.com/renanccastro/node-libxslt.git"
   },
   "license": "MIT",
   "dependencies": {
     "bindings": "^1.3.0",
-    "libxmljs-mt": "git+https://github.com/alexdee2007/libxmljs.git",
+    "libxmljs-mt": "git+https://github.com/renanccastro/libxmljs.git",
     "nan": "~2.10.0"
   },
   "devDependencies": {
