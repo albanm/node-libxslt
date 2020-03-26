@@ -1,5 +1,5 @@
 {
-  "name": "node10-libxslt",
+  "name": "libxslt",
   "version": "0.8.0",
   "description": "[Fork] Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
@@ -15,16 +15,16 @@
     "bindings"
   ],
   "author": "Alban Mouton <alban.mouton@gmail.com>",
-  "homepage": "https://github.com/renanccastro/node-libxslt",
+  "homepage": "https://github.com/albanm/node-libxslt",
   "contributors": [
     "Rui Azevedo <ruihfazevedo@gmail.com> (http://www.r-site.net/)"
   ],
   "bugs": {
-    "url": "https://github.com/renanccastro/node-libxslt/issues"
+    "url": "https://github.com/albanm/node-libxslt/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/renanccastro/node-libxslt.git"
+    "url": "https://github.com/albanm/node-libxslt.git"
   },
   "license": "MIT",
   "dependencies": {
