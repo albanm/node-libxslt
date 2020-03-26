@@ -14,19 +14,20 @@ Stylesheet::~Stylesheet()
     xsltFreeStylesheet(stylesheet_obj);
 }
 
-void Stylesheet::Init(Handle<Object> exports) {
+void Stylesheet::Init(Local<Object> exports) {
 	 // Prepare constructor template
     Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>();
     tpl->SetClassName(Nan::New<String>("Stylesheet").ToLocalChecked());
   	tpl->InstanceTemplate()->SetInternalFieldCount(1);
   	
-    constructor.Reset(tpl->GetFunction());
+    constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 // not called from node, private api
 Local<Object> Stylesheet::New(xsltStylesheetPtr stylesheetPtr) {
     Nan::EscapableHandleScope scope;
-    Local<Object> wrapper = Nan::New(constructor)->NewInstance();
+    //Local<Object> wrapper = Nan::New(constructor)->NewInstance();
+    Local<Object> wrapper = Nan::NewInstance(Nan::New(constructor)).ToLocalChecked();	
     Stylesheet* stylesheet = new Stylesheet(stylesheetPtr);
     stylesheet->Wrap(wrapper);
     return scope.Escape(wrapper);

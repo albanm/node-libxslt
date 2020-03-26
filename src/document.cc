@@ -14,7 +14,7 @@ Document::~Document()
     xmlFreeDocument(document_obj);
 }
 
-void Document::Init(Handle<Object> exports) {
+void Document::Init(Local<Object> exports) {
 	 // Prepare constructor template
   	Local<FunctionTemplate> tpl = FunctionTemplate::New();
   	tpl->SetClassName(String::NewSymbol("Document"));
