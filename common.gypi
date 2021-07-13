@@ -1,7 +1,7 @@
 # imitation of this https://github.com/TooTallNate/node-vorbis/blob/master/common.gypi
 {
   'variables': {
-    'node_xmljs': '<!(node -p -e "require(\'path\').dirname(require.resolve(\'node1-libxmljsmt\'))")',
+    'node_xmljs': '<!(node -p -e "require(\'path\').dirname(require.resolve(\'node1-libxmljsmt-myh\'))")',
     'xmljs_include_dirs': [
       '<(node_xmljs)/src/',
       '<(node_xmljs)/vendor/libxml/include',
@@ -10,11 +10,11 @@
     'conditions': [
       ['OS=="win"', {
         'xmljs_libraries': [
-          '<(node_xmljs)/build/$(Configuration)/xmljs.lib'
+          '<(node_xmljs)/build/$(Configuration)/xmljs-myh.lib'
         ],
       }, {
         'xmljs_libraries': [
-          '<(node_xmljs)/build/$(BUILDTYPE)/xmljs.node',
+          '<(node_xmljs)/build/$(BUILDTYPE)/xmljs-myh.node',
           '-Wl,-rpath,<(node_xmljs)/build/$(BUILDTYPE)'
         ],
       }],
