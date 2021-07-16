@@ -28,14 +28,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "bindings": "^1.3.0",
-    "node1-libxmljsmt": "1.0.0",
-    "nan": "~2.14.0"
+    "bindings": "^1.5.0",
+    "node1-libxmljsmt-myh": "1.0.4",
+    "nan": "~2.14.2"
   },
   "devDependencies": {
-    "async": "~0.9.0",
-    "jsdoc-to-markdown": "^5.0.3",
-    "mocha": "^1.21.4",
-    "should": "~4.0.4"
+    "async": "~3.2.0",
+    "jsdoc-to-markdown": "^7.0.1",
+    "mocha": "^9.0.2",
+    "should": "~13.2.3"
   }
 }
