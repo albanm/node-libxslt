@@ -1,6 +1,6 @@
 {
   "name": "libxslt",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "[Fork] Node.js bindings for libxslt compatible with libxmljs",
   "main": "index.js",
   "scripts": {
