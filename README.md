@@ -48,7 +48,7 @@ The libxmljs module required by node-libxslt is exposed as ```require('libxslt')
 It is possible to work with libxmljs documents instead of strings:
 
 ```js
-var lixslt = require('libxslt');
+var libxslt = require('libxslt');
 var libxmljs = libxslt.libxmljs;
 
 var stylesheetObj = libxmljs.parseXml(stylesheetString, { nocdata: true });
