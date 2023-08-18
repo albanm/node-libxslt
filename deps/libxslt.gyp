@@ -59,6 +59,9 @@
         'libxslt/libxslt/xsltlocale.c',
         'libxslt/libxslt/xsltutils.c'
       ],
+      'dependencies': [
+        '<(node_xmljs)/binding.gyp:xmljs-myh'
+      ],
       'link_settings': {
         'libraries': [
           '<@(xmljs_libraries)',
