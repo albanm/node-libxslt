@@ -45,7 +45,8 @@ static void xslt_generic_error_handler(void * ctx, const char *msg, ...)
   va_start(args, msg);
   vasprintf(&message, msg, args);
   va_end(args);
-  strncpy((char*)ctx, message, 2048);
+  strncpy((char*)ctx, message, 2047);
+  ((char*)ctx)[2047] = '\0';
   free(message);
 }
 
